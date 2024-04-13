@@ -10,11 +10,11 @@ use axum_session_auth::*;
 use core::pin::Pin;
 use dioxus_fullstack::prelude::*;
 use serde::{Deserialize, Serialize};
+use sqlx::postgres::PgPoolOptions;
+use sqlx::PgPool;
 use std::error::Error;
 use std::future::Future;
 use std::{collections::HashSet, net::SocketAddr, str::FromStr};
-use sqlx::PgPool;
-use sqlx::postgres::PgPoolOptions;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct User {
@@ -84,12 +84,12 @@ impl User {
 
         //lets just get all the tokens the user can use, we will only use the full permissions if modifing them.
         let sql_user_perms = sqlx::query_as::<_, SqlPermissionTokens>(
-            "SELECT token FROM user_permissions WHERE user_id = $1;",
+            "SELECT token FROM users_permissions WHERE user_id = $1;",
         )
-            .bind(id)
-            .fetch_all(pool)
-            .await
-            .ok()?;
+        .bind(id)
+        .fetch_all(pool)
+        .await
+        .ok()?;
 
         Some(sqluser.into_user(Some(sql_user_perms)))
     }
@@ -104,21 +104,21 @@ impl User {
                 )
             "#,
         )
-            .execute(pool)
-            .await
-            .unwrap();
+        .execute(pool)
+        .await
+        .unwrap();
 
         sqlx::query(
             r#"
-                CREATE TABLE IF NOT EXISTS user_permissions (
+                CREATE TABLE IF NOT EXISTS users_permissions (
                     "user_id" INTEGER NOT NULL,
                     "token" VARCHAR(256) NOT NULL
                 )
         "#,
         )
-            .execute(pool)
-            .await
-            .unwrap();
+        .execute(pool)
+        .await
+        .unwrap();
 
         sqlx::query(
             r#"
@@ -129,9 +129,9 @@ impl User {
                     username = EXCLUDED.username
             "#,
         )
-            .execute(pool)
-            .await
-            .unwrap();
+        .execute(pool)
+        .await
+        .unwrap();
 
         sqlx::query(
             r#"
@@ -142,19 +142,19 @@ impl User {
                     username = EXCLUDED.username
             "#,
         )
-            .execute(pool)
-            .await
-            .unwrap();
+        .execute(pool)
+        .await
+        .unwrap();
 
         sqlx::query(
             r#"
-                INSERT INTO user_permissions
+                INSERT INTO users_permissions
                     (user_id, token) SELECT 2, 'Category::View'
             "#,
         )
-            .execute(pool)
-            .await
-            .unwrap();
+        .execute(pool)
+        .await
+        .unwrap();
     }
 }
 
@@ -192,7 +192,7 @@ pub async fn connect_to_pbdb() -> Result<PgPool, sqlx::Error> {
 }
 
 pub struct Session(
-    pub axum_session_auth::AuthSession<
+    pub  axum_session_auth::AuthSession<
         crate::auth::User,
         i64,
         axum_session_auth::SessionPgPool,
@@ -254,8 +254,8 @@ impl<S: std::marker::Sync + std::marker::Send> axum::extract::FromRequestParts<S
             axum_session_auth::SessionPgPool,
             sqlx::PgPool,
         >::from_request_parts(parts, state)
-            .await
-            .map(Session)
-            .map_err(|_| AuthSessionLayerNotFound)
+        .await
+        .map(Session)
+        .map_err(|_| AuthSessionLayerNotFound)
     }
 }
