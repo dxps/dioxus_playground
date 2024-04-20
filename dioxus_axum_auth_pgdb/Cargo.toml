@@ -39,5 +39,6 @@ anyhow = "1.0.71"
 
 [features]
 default = []
-server = [ "axum", "tokio", "dioxus-fullstack/axum", "tower-http", "log", "simple_logger", "async-trait", "sqlx", "axum_session", "axum_session_auth", "http", "tower" ]
+server = [ "axum", "tokio", "dioxus-fullstack/axum", "tower-http", "log", "simple_logger",
+           "async-trait", "sqlx", "axum_session", "axum_session_auth", "http", "tower" ]
 web = [ "dioxus-web" ]

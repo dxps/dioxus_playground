@@ -1,10 +1,3 @@
-//! Run with:
-//!
-//! ```sh
-//! dx build --features web
-//! cargo run --features server
-//! ```
-
 #![allow(non_snake_case, unused)]
 
 #[cfg(feature = "server")]
@@ -26,5 +19,3 @@ fn main() {
     #[cfg(feature = "server")]
     server::server_start(ui::app)
 }
-
-//
