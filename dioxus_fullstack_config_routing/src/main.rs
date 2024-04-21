@@ -1,8 +1,6 @@
 #![allow(non_snake_case)]
 
-#[cfg(feature = "server")]
-mod auth;
-mod server;
+pub mod server;
 
 mod ui;
 

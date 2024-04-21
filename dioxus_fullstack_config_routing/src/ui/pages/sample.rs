@@ -14,8 +14,10 @@ pub fn Sample() -> Element {
             div { class: "flex flex-col min-h-screen justify-center items-center drop-shadow-2xl",
                 div { class: "bg-white p-4 rounded-md",
                     h1 { "High-Five counter: {count}" }
-                    button { class: "bg-slate-300 rounded-lg m-2 px-2 py-1", onclick: move |_| count += 1, "Up high!" }
-                    button { class: "bg-slate-400 rounded-lg m-2 px-2 py-1", onclick: move |_| count -= 1, "Down low!" }
+                    button { class: "bg-slate-300 rounded-lg m-2 px-2 py-1", onclick: move |_| count += 1, " + " }
+                    button { class: "bg-slate-400 rounded-lg m-2 px-2 py-1", onclick: move |_| count -= 1, " - " }
+                }
+                div { class: "bg-white mt-6 p-4 rounded-md",
                     button { class: "bg-slate-100 rounded-lg m-2 px-2 py-1",
                         onclick: move |_| async move {
                             if let Ok(data) = get_server_data().await {
@@ -29,9 +31,8 @@ pub fn Sample() -> Element {
                     p { "Server data: {text}"}
                 }
                 div { class: "pt-12",
-                    Link {
-                        to: Route::Home {}, "Back to Home"
-                    }
+                    Link { class: "pr-6", to: Route::Blog { id: count() }, "Go to Blog id {count}"}
+                    Link { to: Route::Home {}, "Back to Home" }
                 }
             }
         }
