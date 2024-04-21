@@ -20,7 +20,7 @@ title = "routing-fullstack-example"
 
 [web.watcher]
 
-# When `dx serve`, it redirect all missing routes to the index.
+# When `dx serve`, it redirects all missing routes to the index.
 index_on_404 = true
 
 # When watcher trigger, regenerate the `index.html`.
