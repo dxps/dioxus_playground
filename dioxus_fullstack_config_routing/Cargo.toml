@@ -1,0 +1,48 @@
+[package]
+name = "tmc-fsrs"
+version = "0.1.0"
+authors = ["dxps <marius.ileana@gmail.com>"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+dioxus = { version = "0.5", features = ["fullstack", "router"] }
+dioxus-web = { version = "0.5.1", features = ["hydrate"], optional = true }
+dioxus-fullstack = { version = "0.5.2" }
+
+axum = { version = "0.7.5", optional = true }
+axum_session = { version = "0.12.1", features = ["postgres-rustls"], optional = true }
+axum_session_auth = { version = "0.12.1", features = ["postgres-rustls"], optional = true }
+
+tokio = { version = "1.37.0", features = ["full"], optional = true }
+tower = { version = "0.4.13", optional = true }
+tower-http = { version = "0.5.2", features = ["auth"], optional = true }
+http = { version = "1.0.0", optional = true }
+
+async-trait = { version = "0.1.71", optional = true }
+sqlx = { version = "0.7.0", features = [
+    "macros",
+    "migrate",
+    "postgres",
+    "_unstable-all-types",
+    "tls-rustls",
+    "runtime-tokio",
+], optional = true }
+
+execute = "0.2.12"
+anyhow = "1.0.71"
+
+serde = { version = "1.0.197", features = ["derive"] }
+
+# Debug
+log = { version = "0.4.21", optional = true }
+simple_logger = { version = "4.3.3", optional = true }
+
+[features]
+default = []
+server = [ 
+    "axum", "tokio", "dioxus-fullstack/axum", "tower-http", "log", "simple_logger",
+    "async-trait",  "sqlx", "axum_session", "axum_session_auth", "http", "tower" ]
+web = ["dioxus-web"]
