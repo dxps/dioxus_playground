@@ -13,6 +13,7 @@ pub fn start(app_fn: fn() -> Element) {
             if is_db_pool_ready().await.is_err() {
                 log::error!("DB Pool is not ready!");
             }
+            log::info!("DB Pool is ready.");
 
             use axum::Router;
             use dioxus::prelude::*;

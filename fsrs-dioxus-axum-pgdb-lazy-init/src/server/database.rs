@@ -48,16 +48,16 @@ pub static MEMDB: Lazy<Mutex<HashMap<u32, Book>>> = Lazy::new(|| {
     ]))
 });
 
-pub async fn init_db_pool() -> Result<PgPool, sqlx::Error> {
-    log::info!("Initing the DB Pool ...");
-    let pool = PgPoolOptions::new()
-        .min_connections(1)
-        .max_connections(3)
-        .idle_timeout(Duration::from_secs(280))
-        .connect("postgres://tmc:tmc@localhost:5442/tmc")
-        .await?;
-    Ok(pool)
-}
+// pub async fn init_db_pool() -> Result<PgPool, sqlx::Error> {
+//     log::info!("Initing the DB Pool ...");
+//     let pool = PgPoolOptions::new()
+//         .min_connections(1)
+//         .max_connections(3)
+//         .idle_timeout(Duration::from_secs(280))
+//         .connect("postgres://tmc:tmc@localhost:5442/tmc")
+//         .await?;
+//     Ok(pool)
+// }
 
 pub static DB: Lazy<PgPool> = Lazy::new(|| {
     log::info!("Initing the DB Pool lazily ...");
@@ -78,14 +78,17 @@ pub static DB: Lazy<PgPool> = Lazy::new(|| {
     }
 });
 
-pub async fn is_db_pool_ready() -> Result<(), sqlx::Error> {
+pub async fn is_db_pool_ready() -> Result<(), String> {
     log::info!("DB Pool idle={} size={}", DB.num_idle(), DB.size());
     let db_pool: &PgPool = DB.deref();
-    let row = sqlx::query("SELECT 1").execute(db_pool).await?;
+    let row = sqlx::query("SELECT 1")
+        .execute(db_pool)
+        .await
+        .map_err(|err| err.to_string())?;
 
-    log::debug!(
-        "[is_db_pool_ready] Test rows affected {}",
-        row.rows_affected()
-    );
-    Ok(())
+    if row.rows_affected() == 1 {
+        Ok(())
+    } else {
+        Err("DB Pool doesn't seem to be inited.".into())
+    }
 }

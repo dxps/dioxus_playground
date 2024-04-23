@@ -3,6 +3,11 @@
 #[cfg(feature = "server")]
 mod server;
 
+use server::database::DB;
+// use crate::server::functions::test_db_usage;
+use sqlx::PgPool;
+use std::ops::Deref;
+
 use dioxus::prelude::*;
 
 #[derive(Clone, Routable, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -29,8 +34,24 @@ fn App() -> Element {
 
 #[component]
 fn Blog(id: i32) -> Element {
+    let mut text = use_signal(|| String::from("..."));
+
     rsx! {
         Link { to: Route::Home {}, "Go to counter" }
+        br {}
+        button {
+            onclick: move |_| async move {
+                if let Ok(data) = test_db_usage().await {
+                    log::info!("Client received: {}", data);
+                    text.set(data.clone());
+                    post_server_data(data).await.unwrap();
+                }
+            },
+            "Test DB Usage"
+        }
+        {}
+        p { "Server (test_db_usage) data: {text}"}
+        {}
         "Blog post {id}"
     }
 }
@@ -66,6 +87,10 @@ fn Home() -> Element {
     }
 }
 
+// ------------------------------------------------------------------
+//                          Server Functions
+// ------------------------------------------------------------------
+
 #[server(PostServerData)]
 async fn post_server_data(data: String) -> Result<(), ServerFnError> {
     log::debug!("Server received: {}", data);
@@ -80,4 +105,25 @@ async fn get_server_data() -> Result<String, ServerFnError> {
     data.get(&1)
         .map(|book| log::debug!("Got book {} from db.", book));
     Ok("Hello from the server!".to_string())
+}
+
+#[server(TestDbUsage)]
+pub async fn test_db_usage() -> Result<String, ServerFnError> {
+    let db_pool: &PgPool = DB.deref();
+    let rs = sqlx::query("SELECT 1")
+        .execute(db_pool)
+        .await
+        .map_err(|err| err.to_string());
+    match rs {
+        Ok(rs) => {
+            let msg = format!("{} rows affected.", rs.rows_affected());
+            log::debug!("{}", msg);
+            Ok(msg)
+        }
+        Err(err) => {
+            let msg = format!("Failed to use db due to '{}'.", err);
+            log::debug!("{}", msg);
+            Err(ServerFnError::Response(msg))
+        }
+    }
 }
