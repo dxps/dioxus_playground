@@ -18,6 +18,7 @@ This project is based on [Dioxus Guide](https://dioxuslabs.com/learn/0.5/guide/f
 -   Styling (for a better UX):
     -   Background on hover on a story (on the left side).
     -   Separate scrollbar for each of the two sides.
+    -   Highlight the currently "selected" (last hovered) story (on the left side).
     -   See an example of the output:
         ![](./screenshot.png)
 

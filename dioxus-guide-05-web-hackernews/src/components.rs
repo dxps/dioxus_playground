@@ -9,7 +9,7 @@ use crate::{
 pub fn Home() -> Element {
     rsx! {
         div { display: "flex", flex_direction: "row", width: "100%",
-            div { class:"bg-gray-100 h-screen overflow-y-auto", width: "50%", Stories {} }
+            div { class:"bg-gray-200 h-screen overflow-y-auto", width: "50%", Stories {} }
             div { class:"h-screen overflow-y-auto", width: "50%", Preview {} }
         }
     }
@@ -59,7 +59,7 @@ fn StoryListing(story: ReadOnlySignal<StoryItem>) -> Element {
     } = story();
 
     let full_story = use_signal::<Option<StoryPageData>>(|| None);
-    let mut is_active = use_signal(|| false);
+    let mut is_active = false;
 
     let url = url.as_deref().unwrap_or_default();
     let hostname = url
@@ -75,22 +75,20 @@ fn StoryListing(story: ReadOnlySignal<StoryItem>) -> Element {
     let time = time.format("%D %l:%M %p");
 
     if let PreviewState::Loaded(active_story) = preview_state() {
-        if active_story.item.id == id && !is_active() {
-            *is_active.write() = true;
-        } else if active_story.item.id != id && is_active() {
-            *is_active.write() = false;
+        if active_story.item.id == id && !is_active {
+            is_active = true;
+        } else if active_story.item.id != id && is_active {
+            is_active = false;
         }
-        log::info!(
-            "id = {} active_story.item.id = {} is_active={}",
-            id,
-            active_story.item.id,
-            is_active
-        );
+    } else {
+        if is_active {
+            is_active = false
+        };
     };
 
     rsx! {
         div {
-            class: if is_active() { "bg-white rounded-lg hover:bg-white hover:rounded-lg" } else { "hover:bg-white hover:rounded-lg" },
+            class: if is_active { "bg-white rounded-lg hover:bg-white hover:rounded-lg" } else { "hover:bg-white hover:rounded-lg" },
             margin: "0.6rem", padding: "0.5rem", position: "relative",
             onmouseenter: move |_| { resolve_story(full_story, preview_state, id) },
             div { font_size: "0.7rem",
