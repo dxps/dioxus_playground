@@ -34,7 +34,12 @@ pub fn Stories() -> Element {
             rsx! { "Failed to fetch the stories due to {err}" }
         }
         None => {
-            rsx! { "Loading the stories ..." }
+            rsx! {
+                div { class: "flex flex-col min-h-screen justify-center items-center",
+                    div { color: "gray", font_size: "1rem", "Loading the headlines ..." }
+                    img { src: "/loading_dots.gif", width: "100px" }
+                }
+            }
         }
     }
 }
@@ -44,13 +49,20 @@ fn Preview() -> Element {
 
     match preview_state() {
         PreviewState::Unset => {
-            rsx! { div { color: "gray", font_size: "0.9rem", padding: "0.5rem",
-               "Hover over a story to preview it here" }
+            rsx! {
+                div { class: "flex flex-col min-h-screen justify-center items-center",
+                    div { color: "gray", font_size: "1rem", "Hover on a story to preview it here" }
+                }
             }
         }
-        PreviewState::Loading => rsx! {
-            div { font_size: "0.9rem", padding: "0.5rem", "Loading the story ..." }
-        },
+        PreviewState::Loading => {
+            rsx! {
+                div { class: "flex flex-col min-h-screen justify-center items-center",
+                    div { color: "gray", font_size: "1rem", "Loading the story ..." }
+                    img { src: "/loading_dots.gif", width: "100px" }
+                }
+            }
+        }
         PreviewState::Loaded(story) => {
             rsx! {
                 div { padding: "0.5rem",

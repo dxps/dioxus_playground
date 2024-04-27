@@ -13,10 +13,10 @@ This project is based on [Dioxus Guide](https://dioxuslabs.com/learn/0.5/guide/f
 
 -   Dioxus [CLI](https://dioxuslabs.com/learn/0.5/getting_started)
 
-    -   Install it (to have `dx` command available) using `cargo install dioxus-cli@0.5.0`
+    -   Install it (to have `dx` command available) using `cargo install dioxus-cli@0.5.4`
 
 -   Styling (for a better UX):
-    -   Background on hover a story (on the left side).
+    -   Background on hover on a story (on the left side).
     -   Separate scrollbar for each of the two sides.
     -   See an example of the output:
         ![](./screenshot.png)
@@ -25,7 +25,7 @@ This project is based on [Dioxus Guide](https://dioxuslabs.com/learn/0.5/guide/f
 
 ### Run
 
-Run `dx serve --hot-reload` in the root of the project to start the Dioxus dev server.
-`run_dev.sh` script is included for this purpose.
+Run `dx serve --hot-reload` in the root of the project to start the Dioxus dev server.\
+For convenience, you can use `./run_dev.sh` included script.
 
-Open the browser to http://localhost:8080
+Open the browser to http://localhost:8080 to see the result.

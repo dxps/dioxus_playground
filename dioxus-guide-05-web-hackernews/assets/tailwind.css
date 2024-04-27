@@ -570,6 +570,22 @@ video {
   height: 100vh;
 }
 
+.min-h-screen {
+  min-height: 100vh;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
 .overflow-y-auto {
   overflow-y: auto;
 }
