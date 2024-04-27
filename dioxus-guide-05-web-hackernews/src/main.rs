@@ -26,7 +26,9 @@ fn main() {
 }
 
 fn App() -> Element {
+    // Setting the initial value of the shared (global) state.
     use_context_provider(|| Signal::new(PreviewState::Unset));
+
     rsx! {
         Router::<Route> {}
     }
