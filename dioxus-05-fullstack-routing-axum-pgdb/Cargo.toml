@@ -1,0 +1,42 @@
+[package]
+
+name = "dioxus-05-fullstack-routing-axum-pgdb"
+version = "0.1.0"
+authors = ["dxps <marius.ileana@gmail.com>"]
+edition = "2021"
+
+
+[dependencies]
+
+serde = { version = "1.0.197", features = ["derive"] }
+
+dioxus = { version = "0.5", features = ["fullstack", "router"] }
+dioxus-fullstack = { version = "0.5.2" }
+dioxus-web = { version = "0.5.1", features = ["hydrate"], optional = true }
+dioxus-logger = "0.5.0"
+
+tracing = "0.1.40"
+
+async-trait = { version = "0.1.80", optional = true }
+
+axum = { version = "0.7.5", optional = true }
+tokio = { version = "1.37.0", features = ["full"], optional = true }
+tower = { version = "0.4.13", optional = true }
+tower-http = { version = "0.5.2", features = ["auth"], optional = true }
+http = { version = "1.0.0", optional = true }
+
+sqlx = { version = "0.7", features = [
+    "macros",
+    "migrate",
+    "postgres",
+    "_unstable-all-types",
+    "tls-rustls",
+    "runtime-tokio",
+], optional = true }
+
+
+[features]
+
+default = []
+server = [ "dioxus/axum", "axum", "tokio", "dioxus-fullstack/axum", "tower-http", "http", "sqlx" ]
+web = ["dioxus/web"]
