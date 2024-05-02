@@ -1,5 +1,8 @@
 use dioxus_fullstack::prelude::*;
 
+#[cfg(feature = "server")]
+use sqlx::{postgres::PgRow, Row};
+
 #[server(Login)]
 pub async fn login() -> Result<(), ServerFnError> {
     let auth: crate::auth::Session = extract().await?;
@@ -17,6 +20,16 @@ pub async fn logout() -> Result<(), ServerFnError> {
 #[server(GetUserName)]
 pub async fn get_user_name() -> Result<String, ServerFnError> {
     let session: crate::auth::Session = extract().await?;
+
+    // Interacting with the database.
+    let dbc = session.1;
+    sqlx::query("SELECT version() as version;")
+        .map(|r: PgRow| {
+            log::debug!("Database version: {}", r.get::<String, _>("version"));
+        })
+        .fetch_all(dbc.as_ref())
+        .await;
+
     Ok(session.0.current_user.unwrap().username.to_string())
 }
 
@@ -26,7 +39,7 @@ pub async fn get_permissions() -> Result<String, ServerFnError> {
     let auth: crate::auth::Session = extract().await?;
     let current_user = auth.current_user.clone().unwrap_or_default();
 
-    // lets check permissions only and not worry about if they are anon or not
+    // Lets check permissions only and not worry about if they are anonymous or not.
     if !axum_session_auth::Auth::<crate::auth::User, i64, sqlx::PgPool>::build(
         [axum::http::Method::POST],
         false,

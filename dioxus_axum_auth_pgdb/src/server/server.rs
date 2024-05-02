@@ -2,28 +2,31 @@ use dioxus::dioxus_core::Element;
 
 #[cfg(feature = "server")]
 pub fn server_start(app_fn: fn() -> Element) {
+    use std::sync::Arc;
+
     //
-    use crate::auth::*;
     use crate::ui::app;
-    use axum::routing::*;
+    use crate::{auth::*, server::ServerState};
+    use axum::{routing::*, Extension};
     use axum_session::{SessionConfig, SessionPgPool, SessionStore};
     use axum_session_auth::AuthConfig;
     use dioxus::prelude::*;
+    use log::{debug, error};
 
     init_logging();
 
     tokio::runtime::Runtime::new()
         .unwrap()
         .block_on(async move {
-            println!("Connecting to the database ...");
-            let pg_pool = connect_to_pbdb().await;
+            debug!("Connecting to the database ...");
+            let pg_pool = connect_to_db().await;
             if pg_pool.is_err() {
-                eprintln!("Failed to connect to database! Exiting now.");
+                error!("Failed to connect to the database! Exiting now.");
                 return;
             }
             let pg_pool = pg_pool.unwrap();
-            println!("Connected to the database.");
-            dbg!(&pg_pool);
+            debug!("Connected to the database.");
+            debug!("pg_pool={:?}", &pg_pool);
 
             // This defaults as normal cookies.
             let session_config = SessionConfig::default().with_table_name("users_sessions");
@@ -34,6 +37,8 @@ pub fn server_start(app_fn: fn() -> Element) {
                     .unwrap();
 
             User::create_user_tables(&pg_pool).await;
+
+            let state = ServerState(Arc::new(pg_pool.clone()));
 
             // Build our application web api router.
             let web_api_router = Router::new()
@@ -48,10 +53,12 @@ pub fn server_start(app_fn: fn() -> Element) {
                         i64,
                         axum_session_auth::SessionPgPool,
                         sqlx::PgPool,
-                    >::new(Some(pg_pool))
+                    >::new(Some(pg_pool.clone()))
                     .with_config(auth_config),
                 )
-                .layer(axum_session::SessionLayer::new(session_store));
+                .layer(axum_session::SessionLayer::new(session_store))
+                .layer(Extension(state));
+            // .with_state(state);
 
             // Start it.
             let addr = std::net::SocketAddr::from(([127, 0, 0, 1], 3000));

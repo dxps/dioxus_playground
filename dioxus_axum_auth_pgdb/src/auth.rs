@@ -1,9 +1,10 @@
 use async_trait::async_trait;
 use axum::{
+    extract::{FromRef, State},
     http::Method,
     response::{IntoResponse, Response},
     routing::get,
-    Router,
+    RequestPartsExt, Router,
 };
 use axum_session::{SessionConfig, SessionLayer, SessionPgPool, SessionStore};
 use axum_session_auth::*;
@@ -12,9 +13,11 @@ use dioxus_fullstack::prelude::*;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPoolOptions;
 use sqlx::PgPool;
-use std::error::Error;
 use std::future::Future;
 use std::{collections::HashSet, net::SocketAddr, str::FromStr};
+use std::{error::Error, sync::Arc};
+
+use crate::server::ServerState;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct User {
@@ -183,10 +186,10 @@ impl SqlUser {
     }
 }
 
-pub async fn connect_to_pbdb() -> Result<PgPool, sqlx::Error> {
+pub async fn connect_to_db() -> Result<PgPool, sqlx::Error> {
     let pool = PgPoolOptions::new()
         .max_connections(3)
-        .connect("postgres://tmc:tmc@localhost:5442/tmc")
+        .connect("postgres://test:test@localhost:5443/test")
         .await?;
     Ok(pool)
 }
@@ -198,6 +201,7 @@ pub struct Session(
         axum_session_auth::SessionPgPool,
         sqlx::PgPool,
     >,
+    pub std::sync::Arc<sqlx::Pool<sqlx::Postgres>>,
 );
 
 impl std::ops::Deref for Session {
@@ -241,13 +245,17 @@ impl IntoResponse for AuthSessionLayerNotFound {
 }
 
 #[async_trait]
-impl<S: std::marker::Sync + std::marker::Send> axum::extract::FromRequestParts<S> for Session {
+impl<S> axum::extract::FromRequestParts<S> for Session
+where
+    S: std::marker::Sync + std::marker::Send,
+{
     type Rejection = AuthSessionLayerNotFound;
 
     async fn from_request_parts(
         parts: &mut http::request::Parts,
         state: &S,
     ) -> Result<Self, Self::Rejection> {
+        //
         axum_session_auth::AuthSession::<
             crate::auth::User,
             i64,
@@ -255,7 +263,11 @@ impl<S: std::marker::Sync + std::marker::Send> axum::extract::FromRequestParts<S
             sqlx::PgPool,
         >::from_request_parts(parts, state)
         .await
-        .map(Session)
+        .map(|auth_session| {
+            let ss = parts.extensions.get::<ServerState>().unwrap();
+            let dbp = ss.0.clone();
+            Session(auth_session, dbp)
+        })
         .map_err(|_| AuthSessionLayerNotFound)
     }
 }

@@ -6,10 +6,6 @@ mod server;
 
 mod ui;
 
-use dioxus::prelude::*;
-use dioxus_fullstack::prelude::*;
-use serde::{Deserialize, Serialize};
-
 fn main() {
     //
     #[cfg(feature = "web")]
