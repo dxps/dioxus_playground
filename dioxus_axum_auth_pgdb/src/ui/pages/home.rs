@@ -1,7 +1,8 @@
 use crate::server::functions::{get_permissions, get_user_name, login, logout};
+use crate::ui::Route;
 use dioxus::prelude::*;
 
-pub fn app() -> Element {
+pub fn Home() -> Element {
     let mut user_name = use_signal(|| "?".to_string());
     let mut permissions = use_signal(|| "?".to_string());
 
@@ -52,6 +53,14 @@ pub fn app() -> Element {
                                 class: "bg-gray-100 px-2 py-1 rounded-md",
                                 onclick: move |_| { async move { logout().await.unwrap(); } },
                                 "Logout Test User"
+                            }
+                        }
+                    },
+                    tr {
+                        td { class: "m-2 p-2 text-center", colspan: "2",
+                            Link {
+                                to: Route::Blog { id: 1234 },
+                                "Go to blog"
                             }
                         }
                     }

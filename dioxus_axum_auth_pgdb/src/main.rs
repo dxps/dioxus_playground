@@ -10,8 +10,8 @@ fn main() {
     //
     #[cfg(feature = "web")]
     // Hydrate the application on the client.
-    dioxus_web::launch::launch_cfg(ui::app, dioxus_web::Config::new().hydrate(true));
+    dioxus_web::launch::launch_cfg(ui::App, dioxus_web::Config::new().hydrate(true));
 
     #[cfg(feature = "server")]
-    server::server_start(ui::app)
+    server::server_start(ui::App)
 }

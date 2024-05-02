@@ -2,16 +2,13 @@ use dioxus::dioxus_core::Element;
 
 #[cfg(feature = "server")]
 pub fn server_start(app_fn: fn() -> Element) {
-    use std::sync::Arc;
-
-    //
-    use crate::ui::app;
     use crate::{auth::*, server::ServerState};
     use axum::{routing::*, Extension};
     use axum_session::{SessionConfig, SessionPgPool, SessionStore};
     use axum_session_auth::AuthConfig;
     use dioxus::prelude::*;
     use log::{debug, error};
+    use std::sync::Arc;
 
     init_logging();
 
@@ -58,7 +55,6 @@ pub fn server_start(app_fn: fn() -> Element) {
                 )
                 .layer(axum_session::SessionLayer::new(session_store))
                 .layer(Extension(state));
-            // .with_state(state);
 
             // Start it.
             let addr = std::net::SocketAddr::from(([127, 0, 0, 1], 3000));
