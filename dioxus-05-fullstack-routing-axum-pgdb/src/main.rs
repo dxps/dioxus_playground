@@ -13,13 +13,16 @@ mod session;
 enum Route {
     #[route("/")]
     Home {},
+
     #[route("/blog/:id")]
     Blog { id: i32 },
 }
 
 fn main() {
-    // Init logger
     dioxus_logger::init(tracing::Level::DEBUG).expect("failed to init logger");
+
+    #[cfg(feature = "web")]
+    launch(App);
 
     #[cfg(feature = "server")]
     server::server_start(App);

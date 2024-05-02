@@ -1,3 +1,4 @@
+#[cfg(feature = "server")]
 use dioxus::dioxus_core::Element;
 
 #[cfg(feature = "server")]

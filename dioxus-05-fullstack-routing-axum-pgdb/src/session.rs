@@ -15,7 +15,7 @@ where
 
     async fn from_request_parts(
         parts: &mut http::request::Parts,
-        state: &S,
+        _state: &S,
     ) -> Result<Self, Self::Rejection> {
         //
         let ss = parts.extensions.get::<ServerState>().unwrap();
