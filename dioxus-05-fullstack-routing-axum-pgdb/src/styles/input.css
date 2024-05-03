@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+	/* The default color of links. */
+	a {
+		@apply text-blue-900;
+	}
+	a:hover {
+		@apply text-blue-700;
+	}
+}

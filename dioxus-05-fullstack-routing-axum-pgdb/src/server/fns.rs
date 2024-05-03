@@ -2,6 +2,7 @@ use dioxus::prelude::*;
 
 #[server(PostServerData)]
 pub async fn post_server_data(data: String) -> Result<(), ServerFnError> {
+    //
     tracing::info!("Server received: {}", data);
     Ok(())
 }

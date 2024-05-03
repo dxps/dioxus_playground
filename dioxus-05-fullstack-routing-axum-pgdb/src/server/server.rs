@@ -3,12 +3,13 @@ use dioxus::dioxus_core::Element;
 
 #[cfg(feature = "server")]
 pub fn server_start(app_fn: fn() -> Element) {
+    //
     use axum::{routing::*, Extension};
     use dioxus::prelude::*;
     use std::sync::Arc;
     use tracing::{debug, error, info};
 
-    use crate::server::{db::connect_to_db, ServerState};
+    use crate::server::{db::connect_to_db, state::ServerState};
 
     tokio::runtime::Runtime::new()
         .unwrap()
@@ -27,7 +28,7 @@ pub fn server_start(app_fn: fn() -> Element) {
 
             // Build our application web api router.
             let web_api_router = Router::new()
-                // Server side render the application, serve static assets, and register server functions.
+                // Server side render the application, serve static assets, and register the server functions.
                 .serve_dioxus_application(ServeConfig::builder().build(), move || {
                     VirtualDom::new(app_fn)
                 })

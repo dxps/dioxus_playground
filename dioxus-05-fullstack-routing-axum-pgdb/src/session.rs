@@ -1,8 +1,8 @@
+use crate::server::state::ServerState;
 use axum::async_trait;
 
-use crate::server::ServerState;
-
 pub struct Session {
+    /// The database connection pool.
     pub dbp: std::sync::Arc<sqlx::Pool<sqlx::Postgres>>,
 }
 
