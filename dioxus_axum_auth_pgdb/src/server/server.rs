@@ -6,7 +6,7 @@ pub fn server_start(app_fn: fn() -> Element) {
     use axum::{routing::*, Extension};
     use axum_session::{SessionAnyPool, SessionConfig, SessionStore};
     use axum_session_auth::{AuthConfig, AuthSessionLayer};
-    use axum_session_sqlx::SessionPgSessionStore;
+    use axum_session_sqlx::{SessionPgPool, SessionPgSessionStore};
     use dioxus::prelude::*;
     use log::{debug, error};
     use sqlx::PgPool;
@@ -28,7 +28,7 @@ pub fn server_start(app_fn: fn() -> Element) {
         // This defaults as normal cookies.
         let session_config = SessionConfig::default().with_table_name("users_sessions");
         let auth_config = AuthConfig::<i64>::default().with_anonymous_user_id(Some(1));
-        let session_store = SessionPgSessionStore::new(Some(pg_pool.clone().into()), session_config)
+        let session_store = SessionStore::<SessionPgPool>::new(Some(pg_pool.clone().into()), session_config)
             .await
             .unwrap();
 
@@ -41,7 +41,7 @@ pub fn server_start(app_fn: fn() -> Element) {
             // Server side render the application, serve static assets, and register server functions.
             .serve_dioxus_application(ServeConfig::builder().build(), move || VirtualDom::new(app_fn))
             .await
-            .layer(AuthSessionLayer::<User, i64, SessionAnyPool, PgPool>::new(Some(pg_pool.clone())).with_config(auth_config))
+            .layer(AuthSessionLayer::<User, i64, SessionPgPool, PgPool>::new(Some(pg_pool.clone())).with_config(auth_config))
             .layer(axum_session::SessionLayer::new(session_store))
             .layer(Extension(state));
 

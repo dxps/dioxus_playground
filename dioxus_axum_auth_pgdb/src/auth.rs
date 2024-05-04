@@ -6,8 +6,9 @@ use axum::{
     routing::get,
     RequestPartsExt, Router,
 };
-use axum_session::{SessionAnyPool, SessionConfig, SessionLayer, SessionStore};
+use axum_session::{SessionConfig, SessionLayer, SessionStore};
 use axum_session_auth::*;
+use axum_session_sqlx::SessionPgPool;
 use core::pin::Pin;
 use dioxus_fullstack::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -187,12 +188,12 @@ pub async fn connect_to_db() -> Result<PgPool, sqlx::Error> {
 }
 
 pub struct Session(
-    pub AuthSession<crate::auth::User, i64, SessionAnyPool, sqlx::PgPool>,
+    pub AuthSession<crate::auth::User, i64, SessionPgPool, sqlx::PgPool>,
     pub Arc<sqlx::Pool<sqlx::Postgres>>,
 );
 
 impl std::ops::Deref for Session {
-    type Target = AuthSession<crate::auth::User, i64, SessionAnyPool, sqlx::PgPool>;
+    type Target = AuthSession<crate::auth::User, i64, SessionPgPool, sqlx::PgPool>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -235,7 +236,7 @@ where
 
     async fn from_request_parts(parts: &mut http::request::Parts, state: &S) -> Result<Self, Self::Rejection> {
         //
-        AuthSession::<User, i64, SessionAnyPool, PgPool>::from_request_parts(parts, state)
+        AuthSession::<User, i64, SessionPgPool, PgPool>::from_request_parts(parts, state)
             .await
             .map(|auth_session| {
                 let ss = parts.extensions.get::<ServerState>().unwrap();
