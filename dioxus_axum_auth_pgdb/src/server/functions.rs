@@ -37,28 +37,25 @@ pub async fn get_user_name() -> Result<String, ServerFnError> {
 pub async fn get_permissions() -> Result<String, ServerFnError> {
     let method: axum::http::Method = extract().await?;
     let auth: crate::auth::Session = extract().await?;
-    let current_user = auth.current_user.clone().unwrap_or_default();
+    let curr_user = auth.current_user.clone().unwrap_or_default();
 
     // Lets check permissions only and not worry about if they are anonymous or not.
-    if !axum_session_auth::Auth::<crate::auth::User, i64, sqlx::PgPool>::build(
-        [axum::http::Method::POST],
-        false,
-    )
-    .requires(axum_session_auth::Rights::any([
-        axum_session_auth::Rights::permission("Category::View"),
-        axum_session_auth::Rights::permission("Admin::View"),
-    ]))
-    .validate(&current_user, &method, None)
-    .await
+    if !axum_session_auth::Auth::<crate::auth::User, i64, sqlx::PgPool>::build([axum::http::Method::POST], false)
+        .requires(axum_session_auth::Rights::any([
+            axum_session_auth::Rights::permission("Category::View"),
+            axum_session_auth::Rights::permission("Admin::View"),
+        ]))
+        .validate(&curr_user, &method, None)
+        .await
     {
         return Ok(format!(
             "User '{}' does not have permissions needed to view this page. Please login.",
-            current_user.username
+            curr_user.username
         ));
     }
 
     Ok(format!(
-        "User '{}' has the needed permissions to view this page. Here are his permissions: {:?}",
-        current_user.username, current_user.permissions
+        "User '{}' has the permissions to view this page. Here are his permissions: {:?}",
+        curr_user.username, curr_user.permissions
     ))
 }

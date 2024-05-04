@@ -6,16 +6,13 @@ use axum::{
     routing::get,
     RequestPartsExt, Router,
 };
-use axum_session::{SessionConfig, SessionLayer, SessionPgPool, SessionStore};
+use axum_session::{SessionAnyPool, SessionConfig, SessionLayer, SessionStore};
 use axum_session_auth::*;
 use core::pin::Pin;
 use dioxus_fullstack::prelude::*;
 use serde::{Deserialize, Serialize};
-use sqlx::postgres::PgPoolOptions;
-use sqlx::PgPool;
-use std::future::Future;
-use std::{collections::HashSet, net::SocketAddr, str::FromStr};
-use std::{error::Error, sync::Arc};
+use sqlx::{postgres::PgPoolOptions, PgPool};
+use std::{collections::HashSet, error::Error, future::Future, net::SocketAddr, str::FromStr, sync::Arc};
 
 use crate::server::ServerState;
 
@@ -86,13 +83,11 @@ impl User {
             .ok()?;
 
         //lets just get all the tokens the user can use, we will only use the full permissions if modifing them.
-        let sql_user_perms = sqlx::query_as::<_, SqlPermissionTokens>(
-            "SELECT token FROM users_permissions WHERE user_id = $1;",
-        )
-        .bind(id)
-        .fetch_all(pool)
-        .await
-        .ok()?;
+        let sql_user_perms = sqlx::query_as::<_, SqlPermissionTokens>("SELECT token FROM users_permissions WHERE user_id = $1;")
+            .bind(id)
+            .fetch_all(pool)
+            .await
+            .ok()?;
 
         Some(sqluser.into_user(Some(sql_user_perms)))
     }
@@ -175,10 +170,7 @@ impl SqlUser {
             anonymous: self.anonymous,
             username: self.username,
             permissions: if let Some(user_perms) = sql_user_perms {
-                user_perms
-                    .into_iter()
-                    .map(|x| x.token)
-                    .collect::<HashSet<String>>()
+                user_perms.into_iter().map(|x| x.token).collect::<HashSet<String>>()
             } else {
                 HashSet::<String>::new()
             },
@@ -195,22 +187,12 @@ pub async fn connect_to_db() -> Result<PgPool, sqlx::Error> {
 }
 
 pub struct Session(
-    pub  axum_session_auth::AuthSession<
-        crate::auth::User,
-        i64,
-        axum_session_auth::SessionPgPool,
-        sqlx::PgPool,
-    >,
-    pub std::sync::Arc<sqlx::Pool<sqlx::Postgres>>,
+    pub AuthSession<crate::auth::User, i64, SessionAnyPool, sqlx::PgPool>,
+    pub Arc<sqlx::Pool<sqlx::Postgres>>,
 );
 
 impl std::ops::Deref for Session {
-    type Target = axum_session_auth::AuthSession<
-        crate::auth::User,
-        i64,
-        axum_session_auth::SessionPgPool,
-        sqlx::PgPool,
-    >;
+    type Target = AuthSession<crate::auth::User, i64, SessionAnyPool, sqlx::PgPool>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -251,23 +233,15 @@ where
 {
     type Rejection = AuthSessionLayerNotFound;
 
-    async fn from_request_parts(
-        parts: &mut http::request::Parts,
-        state: &S,
-    ) -> Result<Self, Self::Rejection> {
+    async fn from_request_parts(parts: &mut http::request::Parts, state: &S) -> Result<Self, Self::Rejection> {
         //
-        axum_session_auth::AuthSession::<
-            crate::auth::User,
-            i64,
-            axum_session_auth::SessionPgPool,
-            sqlx::PgPool,
-        >::from_request_parts(parts, state)
-        .await
-        .map(|auth_session| {
-            let ss = parts.extensions.get::<ServerState>().unwrap();
-            let dbp = ss.0.clone();
-            Session(auth_session, dbp)
-        })
-        .map_err(|_| AuthSessionLayerNotFound)
+        AuthSession::<User, i64, SessionAnyPool, PgPool>::from_request_parts(parts, state)
+            .await
+            .map(|auth_session| {
+                let ss = parts.extensions.get::<ServerState>().unwrap();
+                let dbp = ss.0.clone();
+                Session(auth_session, dbp)
+            })
+            .map_err(|_| AuthSessionLayerNotFound)
     }
 }
