@@ -4,18 +4,33 @@ version = "0.1.0"
 authors = ["dxps <marius.ileana@gmail.com>"]
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+##############
 [dependencies]
-serde = { version = "1.0.197", features = ["derive"] }
+##############
 
 dioxus = { version = "0.5", features = ["fullstack", "router"] }
+
+console_log = { version = "1.0.0", optional = true }
+log = { version = "0.4.21", optional = true }
+
+serde = { version = "1.0.197", features = ["derive"] }
 
 # Debug
 tracing = "0.1.40"
 dioxus-logger = "0.5.0"
 
+
+##########
 [features]
+##########
+
 default = []
-server = ["dioxus/axum"]
-web = ["dioxus/web"]
+server = [
+    "dioxus/axum",
+    "log", "console_log"
+]
+web = [
+    "dioxus/web",
+    "log", "console_log"
+]
