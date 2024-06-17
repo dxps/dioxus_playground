@@ -1,0 +1,14 @@
+[package]
+name = "dioxus-05-web-click-handlers"
+version = "0.1.0"
+authors = ["dxps <marius.ileana@gmail.com>"]
+edition = "2021"
+
+[dependencies]
+
+dioxus = { version = "0.5", features = ["web"] }
+
+tracing = "0.1.40"
+
+log = "0.4.21"
+console_log = "1.0.0"
