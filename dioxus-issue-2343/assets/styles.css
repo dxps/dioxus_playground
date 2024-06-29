@@ -662,6 +662,10 @@ textarea:focus {
   width: max-content;
 }
 
+.w-\[600px\] {
+  width: 600px;
+}
+
 .cursor-pointer {
   cursor: pointer;
 }
@@ -780,6 +784,10 @@ textarea:focus {
 
 .font-semibold {
   font-weight: 600;
+}
+
+.font-medium {
+  font-weight: 500;
 }
 
 .tracking-wide {

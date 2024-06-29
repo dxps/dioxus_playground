@@ -45,7 +45,7 @@ fn Home() -> Element {
                     ul { class: "flex gap-4 bg-gray-100 rounded-lg my-4 p-[3.4px] w-max overflow-hidden font-sans mx-auto",
                         li {
                             class: if tab_to_show() == "primary_info".to_string() {
-                                "text-green-600 font-semibold rounded-lg text-center text-sm bg-white py-2 px-4 tracking-wide cursor-pointer"
+                                "text-green-600 font-medium rounded-lg text-center text-sm bg-white py-2 px-4 tracking-wide cursor-pointer"
                             } else {
                                 "text-gray-600 rounded-lg text-center text-sm hover:bg-white hover:text-lilac py-2 px-4 tracking-wide cursor-pointer"
                             },
@@ -54,7 +54,7 @@ fn Home() -> Element {
                         }
                         li {
                             class: if tab_to_show() == "security".to_string() {
-                                "text-green-600 font-semibold rounded-lg text-center text-sm bg-white py-2 px-4 tracking-wide cursor-pointer"
+                                "text-green-600 font-medium rounded-lg text-center text-sm bg-white py-2 px-4 tracking-wide cursor-pointer"
                             } else {
                                 "text-gray-600 rounded-lg text-center text-sm hover:bg-white hover:text-lilac py-2 px-4 tracking-wide cursor-pointer"
                             },
@@ -83,7 +83,7 @@ fn PrimaryInfo() -> Element {
     let saved = use_signal(|| false);
 
     rsx! {
-        div { class: "mt-8 space-y-6",
+        div { class: "mt-8 space-y-6 w-[600px]",
             div {
                 label { class: "text-sm text-gray-500 block mb-2", "Username" }
                 input {
@@ -145,7 +145,7 @@ fn Security() -> Element {
     let mut confirm_password = use_signal(|| String::new());
 
     rsx! {
-        div { class: "mt-8 space-y-6",
+        div { class: "mt-8 space-y-6 w-[600px]",
             div { class: "flex flex-row text-sm text-gray-500", { "Id: 123" } }
             div {
                 label { class: "text-sm text-gray-500 block mb-2", "New password" }
@@ -159,11 +159,11 @@ fn Security() -> Element {
                 }
             }
             div {
-                label { class: "text-sm text-gray-500 block mb-2", "New password" }
+                label { class: "text-sm text-gray-500 block mb-2", "Confirm password" }
                 input {
                     class: "w-full",
                     r#type: "password",
-                    placeholder: "Set a new password",
+                    placeholder: "Set a new password again",
                     value: "",
                     maxlength: 48,
                     oninput: move |evt| { confirm_password.set(evt.value()) }
