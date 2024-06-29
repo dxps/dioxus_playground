@@ -1,17 +1,22 @@
 ## Issue 2343 Reproducible Example
 
-This example tries to reproduce issue [2343](https://github.com/DioxusLabs/dioxus/issues/2343) in Dioxus 0.5.
+This example reproduces the issue [2343](https://github.com/DioxusLabs/dioxus/issues/2343) that exists in Dioxus 0.5.1.
 
 ### Usage
 
-In a terminal, run `./run_css.sh` to compile the CSS.
-In another terminal, run `./run_dev` to run the example.
+1. In a terminal, run `./run_css.sh` to compile the CSS.
+2. In another terminal, run `./run_dev` to run the example.
 
 ### The Issue
 
-To reproduce the issue click on 2nd tab, click on 1st tab, click on 2nd tab, click on 1st tab.
+To reproduce the issue:
 
-The error thown on the _Console_ looks like this:
+-   click on 2nd tab
+-   click on 1st tab
+-   click on 2nd tab
+-   click on 1st tab.
+
+The error thown to the _Console_ looks like this:
 
 ```
 panicked at /home/dxps/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dioxus-core-0.5.1/src/arena.rs:57:32:
