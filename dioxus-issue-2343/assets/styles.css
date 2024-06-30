@@ -633,10 +633,6 @@ textarea:focus {
   margin-bottom: 2rem;
 }
 
-.mt-24 {
-  margin-top: 6rem;
-}
-
 .mt-8 {
   margin-top: 2rem;
 }
@@ -653,6 +649,10 @@ textarea:focus {
   min-height: 100vh;
 }
 
+.w-\[600px\] {
+  width: 600px;
+}
+
 .w-full {
   width: 100%;
 }
@@ -660,10 +660,6 @@ textarea:focus {
 .w-max {
   width: -moz-max-content;
   width: max-content;
-}
-
-.w-\[600px\] {
-  width: 600px;
 }
 
 .cursor-pointer {
@@ -780,10 +776,6 @@ textarea:focus {
 
 .font-bold {
   font-weight: 700;
-}
-
-.font-semibold {
-  font-weight: 600;
 }
 
 .font-medium {

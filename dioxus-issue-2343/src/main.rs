@@ -6,9 +6,6 @@ use dioxus::prelude::*;
 enum Route {
     #[route("/")]
     Home {},
-
-    #[route("/blog/:id")]
-    Blog { id: i32 },
 }
 
 fn main() {
@@ -24,14 +21,6 @@ fn App() -> Element {
 }
 
 #[component]
-fn Blog(id: i32) -> Element {
-    rsx! {
-        Link { to: Route::Home {}, "Go to home" }
-        "Blog post {id}"
-    }
-}
-
-#[component]
 fn Home() -> Element {
     //
     let mut tab_to_show = use_signal(|| "primary_info".to_string());
@@ -39,7 +28,7 @@ fn Home() -> Element {
     rsx! {
         div { class: "flex flex-col min-h-screen bg-gray-100",
             div { class: "flex flex-col min-h-screen justify-center items-center drop-shadow-2xl",
-                div { class: "bg-white rounded-md p-6 mt-24 mb-8",
+                div { class: "bg-white rounded-md p-6 mt-8 mb-8",
                     h1 { class: "text-3xl text-[#333] font-bold text-center", "My Profile" }
                     // The tabs.
                     ul { class: "flex gap-4 bg-gray-100 rounded-lg my-4 p-[3.4px] w-max overflow-hidden font-sans mx-auto",
@@ -111,7 +100,7 @@ fn PrimaryInfo() -> Element {
                 textarea {
                     class: "w-full rounded-md py-2.5 px-3",
                     cols: 64,
-                    rows: 6,
+                    rows: 3,
                     placeholder: "Biography",
                     value: "",
                     maxlength: 1024,
