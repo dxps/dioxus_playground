@@ -1,0 +1,23 @@
+[package]
+name = "dioxus-05-dyna-table"
+version = "0.1.0"
+authors = ["dxps <marius.ileana@gmail.com>"]
+edition = "2021"
+
+
+[dependencies]
+
+dioxus = { version = "0.5", features = ["fullstack", "router"] }
+
+serde = { version = "1.0.197", features = ["derive"] }
+
+# Debug
+tracing = "0.1.40"
+dioxus-logger = "0.5.0"
+
+
+[features]
+
+default = []
+server = [ "dioxus/axum" ]
+web = [ "dioxus/web" ]
