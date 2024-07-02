@@ -1,0 +1,28 @@
+[package]
+name = "dioxus-05-test-storage"
+version = "0.1.0"
+authors = ["dxps <marius.ileana@gmail.com>"]
+edition = "2021"
+
+
+#============#
+[dependencies]
+#============#
+
+dioxus = { git = "https://github.com/DioxusLabs/dioxus", branch = "v0.5", features = [ "fullstack", "router" ] }
+dioxus-signals = "0.5.1"
+dioxus-sdk = { version = "0.5.0", features = ["storage"] }
+
+serde = { version = "1.0.197", features = [ "derive" ] }
+
+tracing = "0.1.40"
+dioxus-logger = "0.5.0"
+
+
+#========#
+[features]
+#========#
+
+default = []
+server = ["dioxus/axum"]
+web = ["dioxus/web"]
