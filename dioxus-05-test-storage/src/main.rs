@@ -30,7 +30,13 @@ fn Home() -> Element {
     // Asynchronously loading the state from localstorage and notify its value through the signal.
     use_future(move || async move {
         let mut state = use_context::<Signal<State>>();
+        // Using this "standard" usage, it crashes with:
+        // ```
+        // panicked at /home/dxps/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dioxus-core-0.5.1/src/global_context.rs:126:64:
+        // to be in a dioxus runtime
+        // ```
         let local_state = State::load_from_localstorage();
+        // let local_state = Signal::new(State::default());
         *state.write() = local_state();
     });
 
