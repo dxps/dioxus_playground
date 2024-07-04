@@ -9,14 +9,44 @@ edition = "2021"
 [dependencies]
 #============#
 
+# Not used due to Dioxus issue #2343.
+# dioxus-signals = "0.5.1"
+# And this issue is fixed in git version 0.5.
 dioxus = { git = "https://github.com/DioxusLabs/dioxus", branch = "v0.5", features = [ "fullstack", "router" ] }
-dioxus-signals = "0.5.1"
-dioxus-sdk = { version = "0.5.0", features = ["storage"] }
+
+dioxus-signals = { git = "https://github.com/DioxusLabs/dioxus", branch = "v0.5" }
+
+# Not used due to Signal declarations conflicts.
+# dioxus-sdk = { version = "0.5.0", features = ["storage"] }
+# And used the lower level `web-sys` instead. See below.
 
 serde = { version = "1.0.197", features = [ "derive" ] }
 
 tracing = "0.1.40"
 dioxus-logger = "0.5.0"
+
+
+[dependencies.web-sys]
+version = "0.3.5"
+features = [
+#   'console',
+#   'CssStyleDeclaration',
+#   'Document',
+#   'DomStringMap',
+#   'DomTokenList',
+#   'Element',
+#   'Event',
+#   'EventTarget',
+#   'HtmlBodyElement',
+#   'HtmlElement',
+#   'HtmlInputElement',
+#   'KeyboardEvent',
+#   'Location',
+#   'Node',
+#   'NodeList',
+  'Storage',
+  'Window',
+]
 
 
 #========#
