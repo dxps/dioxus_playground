@@ -1,0 +1,3 @@
+## Dioxus Fullstack 0.5 Callbacks
+
+WIP experiment ...
