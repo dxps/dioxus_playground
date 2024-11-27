@@ -25,6 +25,15 @@ fn App() -> Element {
 
 #[component]
 fn Home() -> Element {
+    //
+    let items = use_signal(|| {
+        vec![
+            (1, "Item 1".to_string()),
+            (2, "Item 2".to_string()),
+            (3, "Item 3".to_string()),
+            (4, "Item 4".to_string()),
+        ]
+    });
     rsx! {
         div {
             div { class: "flex flex-col min-h-screen bg-gray-100",
@@ -34,7 +43,7 @@ fn Home() -> Element {
                             "HTML List Drag-n-Drop"
                         }
                         hr { class: "mb-8" }
-                        SortableList {}
+                        SortableList { items }
                     }
                 }
             }
@@ -43,10 +52,20 @@ fn Home() -> Element {
 }
 
 #[component]
-fn SortableList() -> Element {
+fn SortableList(items: Signal<Vec<(i32, String)>>) -> Element {
     //
     let mut drag_source_item = use_signal(|| 0);
     let mut drag_target_item = use_signal(|| 0);
+
+    // React on changes.
+    use_memo(move || {
+        info!(
+            ">>> React on changes: drag_source_item: {} drag_target_item: {}",
+            drag_source_item(),
+            drag_target_item()
+        );
+    });
+
     rsx! {
         div { class: "mb-4 flex flex-col items-center",
             div { class: "text-gray-500", "Drag and drop items to reorder: " }
