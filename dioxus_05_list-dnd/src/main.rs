@@ -1,7 +1,10 @@
 #![allow(non_snake_case)]
 
+mod sortable_list;
+
 use dioxus::prelude::*;
 use dioxus_logger::tracing::{info, Level};
+use sortable_list::SortableList;
 
 #[derive(Clone, Routable, Debug, PartialEq)]
 enum Route {
@@ -34,6 +37,7 @@ fn Home() -> Element {
             (4, "Item 4".to_string()),
         ]
     });
+
     rsx! {
         div {
             div { class: "flex flex-col min-h-screen bg-gray-100",
@@ -46,79 +50,6 @@ fn Home() -> Element {
                         SortableList { items }
                     }
                 }
-            }
-        }
-    }
-}
-
-#[component]
-fn SortableList(items: Signal<Vec<(i32, String)>>) -> Element {
-    //
-    let mut drag_source_item = use_signal(|| 0);
-    let mut drag_target_item = use_signal(|| 0);
-
-    // React on changes.
-    use_memo(move || {
-        info!(
-            ">>> React on changes: drag_source_item: {} drag_target_item: {}",
-            drag_source_item(),
-            drag_target_item()
-        );
-    });
-
-    rsx! {
-        div { class: "mb-4 flex flex-col items-center",
-            div { class: "text-gray-500", "Drag and drop items to reorder: " }
-            div { class: "text-gray-700", " {drag_source_item} -> {drag_target_item}" }
-        }
-        ul { class: "list-disc ml-4",
-            li {
-                draggable: true,
-                ondragstart: move |e| {
-                    e.stop_propagation();
-                    drag_source_item.set(1);
-                },
-                ondragover: move |e| {
-                    e.stop_propagation();
-                    drag_target_item.set(1);
-                },
-                "Item 1"
-            }
-            li {
-                draggable: true,
-                ondragstart: move |e| {
-                    e.stop_propagation();
-                    drag_source_item.set(2);
-                },
-                ondragover: move |e| {
-                    e.stop_propagation();
-                    drag_target_item.set(2);
-                },
-                "Item 2"
-            }
-            li {
-                draggable: true,
-                ondragstart: move |e| {
-                    e.stop_propagation();
-                    drag_source_item.set(3);
-                },
-                ondragover: move |e| {
-                    e.stop_propagation();
-                    drag_target_item.set(3);
-                },
-                "Item 3"
-            }
-            li {
-                draggable: true,
-                ondragstart: move |e| {
-                    e.stop_propagation();
-                    drag_source_item.set(4);
-                },
-                ondragover: move |e| {
-                    e.stop_propagation();
-                    drag_target_item.set(4);
-                },
-                "Item 4"
             }
         }
     }
