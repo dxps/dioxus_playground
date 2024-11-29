@@ -10,3 +10,4 @@ dioxus = { version = "0.5.6", features = ["web", "router"] }
 
 # Debug
 dioxus-logger = "0.5.1"
+indexmap = { version = "2.6.0", features = ["serde"] }

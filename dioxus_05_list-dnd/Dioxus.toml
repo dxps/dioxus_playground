@@ -16,7 +16,7 @@ asset_dir = "assets"
 [web.app]
 
 # HTML title tag content
-title = "HTML List Drag-n-Drop w/ Dioxus"
+title = "Drag-n-Drop List on Dioxus"
 
 [web.watcher]
 
