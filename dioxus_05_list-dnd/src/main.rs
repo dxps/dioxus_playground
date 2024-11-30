@@ -3,7 +3,7 @@
 mod dnd_list;
 
 use dioxus::prelude::*;
-use dioxus_logger::tracing::{info, Level};
+use dioxus_logger::tracing::Level;
 use dnd_list::DnDList;
 use indexmap::IndexMap;
 
@@ -36,22 +36,25 @@ fn Home() -> Element {
 
     let mut new_items = use_signal(|| IndexMap::<String, String>::from(items.clone()));
     let order_change = use_signal(|| (0, 0));
+    let dragging_in_progress = use_signal(|| false);
 
     use_effect(move || {
         let (source_index, target_index) = order_change();
-        if source_index != target_index {
+        if source_index != target_index && !dragging_in_progress() {
             let mut changed_items = items.clone();
             if source_index < target_index {
                 for index in source_index..target_index {
-                    info!(">>> [Home] Swapping {} and {}", index, index + 1);
                     changed_items.swap_indices(index, index + 1);
                 }
-                info!(">>> [Home] After swap, changed_items: {:?}", changed_items);
-                items = changed_items.clone();
-                new_items.set(changed_items);
             } else {
-                // TODO
+                let mut descending_range = (target_index..source_index).rev();
+                let descending_iter: &mut dyn Iterator<Item = usize> = &mut descending_range;
+                for index in descending_iter {
+                    changed_items.swap_indices(index, index + 1);
+                }
             }
+            items = changed_items.clone();
+            new_items.set(changed_items);
         }
     });
 
@@ -59,12 +62,12 @@ fn Home() -> Element {
         div {
             div { class: "flex flex-col min-h-screen bg-gray-100",
                 div { class: "flex flex-col min-h-screen justify-center items-center drop-shadow-2xl",
-                    div { class: "bg-white rounded-md p-6 mt-8 mb-8 w-[600px]",
-                        h2 { class: "text-3xl text-gray-500 font-medium text-center",
-                            "Drag-n-Drop List"
+                    div { class: "bg-white rounded-md p-6 mt-8 mb-8 w-[600px] min-h-[300px]",
+                        p { class: "text-2xl text-gray-500 font-medium text-center",
+                            "Drag and Drop List"
                         }
-                        hr { class: "mb-8" }
-                        DnDList { items: new_items, order_change }
+                        hr { class: "mb-4" }
+                        DnDList { items: new_items, order_change, dragging_in_progress }
                     }
                 }
             }
