@@ -40,18 +40,15 @@ fn Home() -> Element {
 
     use_effect(move || {
         let (source_index, target_index) = order_change();
-        if source_index != target_index && !dragging_in_progress() {
+        if !dragging_in_progress() && source_index != target_index {
             let mut changed_items = items.clone();
-            if source_index < target_index {
-                for index in source_index..target_index {
-                    changed_items.swap_indices(index, index + 1);
-                }
+            let range: &mut dyn Iterator<Item = usize> = if source_index < target_index {
+                &mut (source_index..target_index)
             } else {
-                let mut descending_range = (target_index..source_index).rev();
-                let descending_iter: &mut dyn Iterator<Item = usize> = &mut descending_range;
-                for index in descending_iter {
-                    changed_items.swap_indices(index, index + 1);
-                }
+                &mut (target_index..source_index).rev().into_iter()
+            };
+            for index in range {
+                changed_items.swap_indices(index, index + 1);
             }
             items = changed_items.clone();
             new_items.set(changed_items);
