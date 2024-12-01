@@ -1,5 +1,5 @@
 [package]
-name = "dioxus_05_list-dnd"
+name = "dioxus_05_dnd_list"
 version = "0.1.0"
 authors = ["dxps <marius.ileana@gmail.com>"]
 edition = "2021"
