@@ -1,0 +1,11 @@
+[package]
+name = "dioxus_05_dnd_divs"
+version = "0.1.0"
+authors = ["dxps <marius.ileana@gmail.com>"]
+edition = "2021"
+
+[dependencies]
+
+dioxus = { version = "0.5.6", features = ["web", "router"] }
+dioxus-logger = "0.5.1"
+indexmap = { version = "2.7.0", features = ["serde"] }
