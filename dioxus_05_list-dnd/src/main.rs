@@ -38,7 +38,7 @@ fn Home() -> Element {
         ("id-4".to_string(), "Fourth Item".to_string()),
     ]);
 
-    let mut reordered_items = use_signal(|| IndexMap::<String, String>::from(items.clone()));
+    let mut ordered_items = use_signal(|| IndexMap::<String, String>::from(items.clone()));
     let order_change = use_signal(|| (0, 0));
     let dragging_in_progress = use_signal(|| false);
 
@@ -56,7 +56,7 @@ fn Home() -> Element {
                 changed_items.swap_indices(index, index + 1);
             }
             items = changed_items.clone();
-            reordered_items.set(changed_items);
+            ordered_items.set(changed_items);
         }
     });
 
@@ -69,7 +69,7 @@ fn Home() -> Element {
                             "Drag and Drop List"
                         }
                         hr { class: "mb-4" }
-                        DnDList { items: reordered_items, order_change, dragging_in_progress }
+                        DnDList { items: ordered_items, order_change, dragging_in_progress }
                     }
                 }
             }
