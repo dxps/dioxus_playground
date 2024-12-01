@@ -3,7 +3,7 @@
 mod dnd_list;
 
 use dioxus::prelude::*;
-use dioxus_logger::tracing::Level;
+use dioxus_logger::tracing::{info, Level};
 use dnd_list::DnDList;
 use indexmap::IndexMap;
 
@@ -27,14 +27,18 @@ fn App() -> Element {
 #[component]
 fn Home() -> Element {
     //
+    // `IndexMap` is a map that keeps the insertion order.
+    // Those items ids are just for reflecting a real world case where
+    // the items have their own id, these having nothing to do with the order.
+    //
     let mut items = IndexMap::from([
-        ("0".to_string(), "First Item".to_string()),
-        ("1".to_string(), "Second Item".to_string()),
-        ("2".to_string(), "Third Item".to_string()),
-        ("3".to_string(), "Fourth Item".to_string()),
+        ("id-1".to_string(), "First Item".to_string()),
+        ("id-2".to_string(), "Second Item".to_string()),
+        ("id-3".to_string(), "Third Item".to_string()),
+        ("id-4".to_string(), "Fourth Item".to_string()),
     ]);
 
-    let mut new_items = use_signal(|| IndexMap::<String, String>::from(items.clone()));
+    let mut reordered_items = use_signal(|| IndexMap::<String, String>::from(items.clone()));
     let order_change = use_signal(|| (0, 0));
     let dragging_in_progress = use_signal(|| false);
 
@@ -48,10 +52,11 @@ fn Home() -> Element {
                 &mut (target_index..source_index).rev().into_iter()
             };
             for index in range {
+                info!(">>> [Home] Swapping {} <-> {}", index, index + 1);
                 changed_items.swap_indices(index, index + 1);
             }
             items = changed_items.clone();
-            new_items.set(changed_items);
+            reordered_items.set(changed_items);
         }
     });
 
@@ -64,7 +69,7 @@ fn Home() -> Element {
                             "Drag and Drop List"
                         }
                         hr { class: "mb-4" }
-                        DnDList { items: new_items, order_change, dragging_in_progress }
+                        DnDList { items: reordered_items, order_change, dragging_in_progress }
                     }
                 }
             }

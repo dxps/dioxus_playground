@@ -44,7 +44,7 @@ pub fn DnDList(
                     },
                     ondragend: move |_| {
                         dragging_in_progress.set(false);
-                        info!(">>> [DnDList] ondragend: {drag_source_index} -> {drag_target_index}");
+                        info!(">>> [DnDList] Dragged {drag_source_index} -> {drag_target_index}");
                     },
                     "{item.1}"
                 }
