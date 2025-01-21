@@ -1,3 +1,7 @@
+mod app_error;
+
+use app_error::AppError;
+
 #[cfg(feature = "server")]
 // See https://dioxuslabs.com/learn/0.6/guides/use axum::routing::get;
 use axum;
@@ -10,6 +14,9 @@ use dioxus_cli_config;
 #[cfg(feature = "server")]
 // See https://dioxuslabs.com/learn/0.6/guides/fullstack/managing_dependencies/
 use tokio;
+
+#[cfg(feature = "server")]
+use sqlx::{postgres::PgPoolOptions, PgPool};
 
 const CSS: Asset = asset!("/assets/main.css");
 
@@ -26,6 +33,20 @@ fn main() {
     #[cfg(not(feature = "server"))]
     dioxus::launch(App);
 }
+
+/////////////////////////////////////////
+// Server elements (functions & logic) //
+////////////////////////////////////////
+
+#[cfg(feature = "server")]
+pub static DB_POOL: std::sync::LazyLock<PgPool> =
+    std::sync::LazyLock::new(|| init_dbpool().unwrap());
+
+// #[cfg(feature = "server")]
+// thread_local! {
+// #[allow(non_upper_case_globals)]
+// pub static dbp: PgPool;
+// }
 
 #[cfg(feature = "server")]
 async fn launch_server() {
@@ -48,6 +69,46 @@ async fn launch_server() {
     axum::serve(listener, router).await.unwrap();
 }
 
+#[cfg(feature = "server")]
+fn init_logging() {
+    use log::LevelFilter::{Info, Warn};
+
+    simple_logger::SimpleLogger::new()
+        .with_module_level("sqlx", Info)
+        .with_module_level("tungstenite", Info)
+        .with_module_level("tokio_tungstenite", Info)
+        .with_module_level("axum_session", Info)
+        .with_module_level("axum_session_auth", Warn)
+        .with_module_level("dioxus_core", Warn)
+        .with_module_level("dioxus_signals", Info)
+        .with_module_level("tracing", Warn)
+        .init()
+        .unwrap();
+}
+
+#[cfg(feature = "server")]
+pub fn init_dbpool() -> Result<PgPool, AppError> {
+    //
+    let db_url = std::env::var("DATABASE_URL").map_err(|err| {
+        log::error!(
+            "Unknown DATABASE_URL environment variable. Reason: '{}'.",
+            err
+        );
+        AppError::Err("Unknown DATABASE_URL environment variable".into())
+    })?;
+
+    let db_conn_options: sqlx::postgres::PgConnectOptions = db_url
+        .parse()
+        .expect("Failed to parse database URL '{db_url}'.");
+
+    let pool = PgPoolOptions::new()
+        .max_connections(3)
+        .connect_lazy_with(db_conn_options);
+    log::info!("Database connection pool created.");
+
+    Ok(pool)
+}
+
 // Expose a `save_dog` endpoint on our server that takes an "image" parameter.
 #[server]
 async fn save_dog(image: String) -> Result<(), ServerFnError> {
@@ -68,6 +129,16 @@ async fn save_dog(image: String) -> Result<(), ServerFnError> {
 
     Ok(())
 }
+
+#[server]
+async fn save_dog_to_db(_image_url: String) -> Result<(), ServerFnError> {
+    log::info!("Number of active db connections: {}.", DB_POOL.size());
+    Ok(())
+}
+
+////////////////
+// Components //
+////////////////
 
 #[component]
 fn App() -> Element {
@@ -117,7 +188,8 @@ fn DogView() -> Element {
                 onclick: move |_| async move {
                     let current = img_src.cloned().unwrap();
                     img_src.restart();
-                    _ = save_dog(current).await;
+                    _ = save_dog(current.clone()).await;
+                    _ = save_dog_to_db(current).await;
                 },
                 id: "save",
                 "Save"
@@ -136,21 +208,4 @@ fn DogView() -> Element {
             }
         }
     }
-}
-
-#[cfg(feature = "server")]
-fn init_logging() {
-    use log::LevelFilter::{Info, Warn};
-
-    simple_logger::SimpleLogger::new()
-        .with_module_level("sqlx", Info)
-        .with_module_level("tungstenite", Info)
-        .with_module_level("tokio_tungstenite", Info)
-        .with_module_level("axum_session", Info)
-        .with_module_level("axum_session_auth", Warn)
-        .with_module_level("dioxus_core", Warn)
-        .with_module_level("dioxus_signals", Info)
-        .with_module_level("tracing", Warn)
-        .init()
-        .unwrap();
 }

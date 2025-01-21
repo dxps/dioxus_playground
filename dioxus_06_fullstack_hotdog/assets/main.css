@@ -554,6 +554,10 @@ video {
   display: none;
 }
 
+.static {
+  position: static;
+}
+
 .my-2 {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
