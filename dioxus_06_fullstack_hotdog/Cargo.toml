@@ -1,0 +1,35 @@
+[package]
+name = "test_dioxus_fullstack"
+version = "0.1.0"
+authors = ["dxps <marius.ileana@gmail.com>"]
+edition = "2021"
+
+[dependencies]
+dioxus = { version = "0.6.0", features = ["router", "fullstack"] }
+dioxus-cli-config = { version = "0.6.1", optional = true }
+axum = { version = "0.7.4", optional = true }
+reqwest = { version = "0.12.12", features = ["json"] }
+serde = { version = "1.0.217", features = ["derive"] }
+tokio = { version = "1.43.0", features = ["full"], optional = true }
+log = { version = "0.4.22", optional = true }
+simple_logger = { version = "5.0.0", optional = true }
+console_log = { version = "1.0.0", optional = true }
+
+[features]
+default = []
+web = ["dioxus/web" ]
+desktop = ["dioxus/desktop"]
+mobile = ["dioxus/mobile"]
+server = [ "dioxus/server", "dep:tokio", "dep:axum", "dep:dioxus-cli-config", "dep:log", "dep:console_log", "dep:simple_logger", ]
+
+[profile]
+
+[profile.wasm-dev]
+inherits = "dev"
+opt-level = 1
+
+[profile.server-dev]
+inherits = "dev"
+
+[profile.android-dev]
+inherits = "dev"
