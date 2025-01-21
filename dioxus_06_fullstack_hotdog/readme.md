@@ -1,6 +1,7 @@
 # Dioxus 0.6 Fullstack example of HotDog app
 
-A minimal fullstack example of the HotDog sample built with Dioxus 0.6.\
+A minimal fullstack example of the HotDog sample built with Dioxus 0.6.
+
 It showcases:
 
 -   On front-end side: how to use components and call server functions.
@@ -22,14 +23,14 @@ Note: These are needed during development. In other words, if you don't change a
 ### Back-end related
 
 1. Have `rust` installed using [rustup.rs](https://rustup.rs/).
-2. Install Dioxus CLI ver. 0.5.7 using `cargo install dioxus-cli@0.5.7`.
+2. Install Dioxus CLI ver. 0.6.1 using `cargo install dioxus-cli@0.6.1`.
 
 <br/>
 
 ## Run
 
 -   Start the Tailwind CSS compiler using `./run_css.sh` script.
--   Start the back-end (that includes the front-end pages/views) using `./run-dev.sh`.
+-   Start the back-end (that includes the front-end pages/views) using `./run-dev.sh` script.
 
 <br/>
 

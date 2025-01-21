@@ -123,7 +123,7 @@ fn DogView() -> Element {
                 "Save"
             }
             button {
-                class: "bg-gray-300 hover:bg-gray-600 hover:text-white rounded-md px-2",
+                class: "bg-gray-300 hover:bg-gray-600 hover:text-white rounded-md px-3",
                 onclick: move |_| img_src.restart(),
                 "id": "refresh",
                 "Refresh"
