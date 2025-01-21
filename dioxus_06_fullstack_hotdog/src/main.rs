@@ -129,7 +129,7 @@ fn DogView() -> Element {
                 "Refresh"
             }
         }
-        div { id: "dogview",
+        div { id: "dogimage",
             img {
                 class: "rounded-lg h-96",
                 src: img_src.cloned().unwrap_or_default(),
