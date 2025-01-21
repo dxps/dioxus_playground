@@ -22,22 +22,23 @@ fn main() {
     tokio::runtime::Runtime::new()
         .unwrap()
         .block_on(launch_server());
+
     #[cfg(not(feature = "server"))]
     dioxus::launch(App);
 }
 
 #[cfg(feature = "server")]
 async fn launch_server() {
-    // Connect to dioxus' logging infrastructure
+    // Connect to dioxus' logging infrastructure.
     dioxus::logger::initialize_default();
 
     init_logging();
     log::info!("Starting up the server ...");
 
-    // Connect to the IP and PORT env vars passed by the Dioxus CLI (or your dockerfile)
+    // Connect to the IP and PORT env vars passed by the Dioxus CLI (or your dockerfile).
     let socket_addr = dioxus_cli_config::fullstack_address_or_localhost();
 
-    // Build a custom axum router
+    // Build a custom axum router.
     let router = axum::Router::new()
         .serve_dioxus_application(ServeConfigBuilder::new(), App)
         .into_make_service();
@@ -47,7 +48,7 @@ async fn launch_server() {
     axum::serve(listener, router).await.unwrap();
 }
 
-// Expose a `save_dog` endpoint on our server that takes an "image" parameter
+// Expose a `save_dog` endpoint on our server that takes an "image" parameter.
 #[server]
 async fn save_dog(image: String) -> Result<(), ServerFnError> {
     use std::io::Write;
@@ -63,7 +64,7 @@ async fn save_dog(image: String) -> Result<(), ServerFnError> {
     // And then write a newline to it with the image url
     _ = file.write_fmt(format_args!("{image}\n"));
 
-    log::info!("Dog saved: {image} to 'dogs.txt'.");
+    log::info!("URL '{image}' was saved to 'dogs.txt' file.");
 
     Ok(())
 }
@@ -74,18 +75,20 @@ fn App() -> Element {
     use_context_provider(|| TitleState("HotDog! 🌭".to_string()));
     rsx! {
         document::Stylesheet { href: CSS }
-        Title {}
-        DogView {}
+        div { class: "flex flex-col min-h-screen bg-gray-300 justify-center items-center",
+            Title {}
+            DogView {}
+        }
     }
 }
 
 #[component]
 fn Title() -> Element {
-    // Consume that type as a Context
+    // Consume that type as a Context.
     let title = use_context::<TitleState>();
     rsx! {
-        div { id: "title",
-            h1 { "{title.0}" }
+        div { id: "title", class: "pb-12",
+            p { class: "text-3xl text-gray-500 font-bold", "{title.0}" }
         }
     }
 }
@@ -108,19 +111,28 @@ fn DogView() -> Element {
     });
 
     rsx! {
-        div { id: "dogview",
-            img { src: img_src.cloned().unwrap_or_default() }
-        }
-        div { id: "buttons",
-            button { onclick: move |_| img_src.restart(), "id": "refresh", "refresh" }
+        div { id: "dogview", class: "flex justify-center mb-4 space-x-4",
             button {
+                class: "bg-gray-300 hover:bg-gray-600 hover:text-white rounded-md px-2",
                 onclick: move |_| async move {
                     let current = img_src.cloned().unwrap();
                     img_src.restart();
                     _ = save_dog(current).await;
                 },
                 id: "save",
-                "save"
+                "Save"
+            }
+            button {
+                class: "bg-gray-300 hover:bg-gray-600 hover:text-white rounded-md px-2",
+                onclick: move |_| img_src.restart(),
+                "id": "refresh",
+                "Refresh"
+            }
+        }
+        div { id: "dogview",
+            img {
+                class: "rounded-lg h-96",
+                src: img_src.cloned().unwrap_or_default(),
             }
         }
     }

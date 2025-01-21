@@ -1,12 +1,12 @@
 [application]
 
 # App (Project) Name
-name = "test_dioxus_fullstack"
+name = "dioxus_06_fullstack_hotdog"
 
 [web.app]
 
 # HTML title tag content
-title = "test_dioxus_fullstack"
+title = "Dioxus 0.6 :: Fullstack HotDog"
 
 # include `assets` in web platform
 [web.resource]
