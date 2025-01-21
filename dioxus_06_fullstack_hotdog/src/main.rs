@@ -12,6 +12,9 @@ use dioxus::prelude::*;
 use dioxus_cli_config;
 
 #[cfg(feature = "server")]
+use sqlx::Row;
+
+#[cfg(feature = "server")]
 // See https://dioxuslabs.com/learn/0.6/guides/fullstack/managing_dependencies/
 use tokio;
 
@@ -24,7 +27,10 @@ const CSS: Asset = asset!("/assets/main.css");
 #[derive(Clone)]
 struct TitleState(String);
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    #[cfg(feature = "server")]
+    dotenvy::dotenv()?;
+
     #[cfg(feature = "server")]
     tokio::runtime::Runtime::new()
         .unwrap()
@@ -32,6 +38,8 @@ fn main() {
 
     #[cfg(not(feature = "server"))]
     dioxus::launch(App);
+
+    Ok(())
 }
 
 /////////////////////////////////////////
@@ -59,7 +67,7 @@ async fn launch_server() {
     // Connect to the IP and PORT env vars passed by the Dioxus CLI (or your dockerfile).
     let socket_addr = dioxus_cli_config::fullstack_address_or_localhost();
 
-    // Build a custom axum router.
+    // Build a custom Axum router.
     let router = axum::Router::new()
         .serve_dioxus_application(ServeConfigBuilder::new(), App)
         .into_make_service();
@@ -132,7 +140,15 @@ async fn save_dog(image: String) -> Result<(), ServerFnError> {
 
 #[server]
 async fn save_dog_to_db(_image_url: String) -> Result<(), ServerFnError> {
+    // For now, just testing the db interaction.
+    let mut conn = DB_POOL.acquire().await.unwrap();
     log::info!("Number of active db connections: {}.", DB_POOL.size());
+    let row = sqlx::query("SELECT to_char(current_timestamp, 'YYYY-MM-DD HH24:MI:SS') now")
+        .fetch_one(conn.as_mut())
+        .await
+        .unwrap();
+    log::info!("Database time: '{}'.", row.get::<&str, &str>("now"));
+
     Ok(())
 }
 
