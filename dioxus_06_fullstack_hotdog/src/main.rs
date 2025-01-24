@@ -51,9 +51,6 @@ pub static DB_POOL: std::sync::LazyLock<PgPool> =
 
 #[cfg(feature = "server")]
 async fn launch_server() {
-    // Connect to dioxus' logging infrastructure.
-    dioxus::logger::initialize_default();
-
     init_logging();
     log::info!("Starting up the server ...");
 
@@ -70,7 +67,6 @@ async fn launch_server() {
     axum::serve(listener, router).await.unwrap();
 }
 
-/// TODO: Logging settings don't work in this setup.
 #[cfg(feature = "server")]
 fn init_logging() {
     use log::LevelFilter::{Info, Warn};
@@ -84,6 +80,7 @@ fn init_logging() {
         .with_module_level("dioxus_core", Warn)
         .with_module_level("dioxus_signals", Info)
         .with_module_level("tracing", Warn)
+        .with_module_level("warnings", Info)
         .init()
         .unwrap();
 }
