@@ -6,7 +6,7 @@ name = "dioxus_06_fullstack_hotdog"
 [web.app]
 
 # HTML title tag content
-title = "Dioxus 0.6 :: Fullstack HotDog"
+title = "HotDog - A Dioxus 0.6 fullstack app"
 
 # include `assets` in web platform
 [web.resource]

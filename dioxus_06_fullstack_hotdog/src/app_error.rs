@@ -1,7 +1,8 @@
 use std::str::FromStr;
 use thiserror::Error;
 
-pub type AppResult<T> = std::result::Result<T, AppError>;
+// Left here for reference.
+// pub type AppResult<T> = std::result::Result<T, AppError>;
 
 #[derive(Debug, Error)]
 pub enum AppError {

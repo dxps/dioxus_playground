@@ -3,25 +3,24 @@ mod app_error;
 use app_error::AppError;
 
 #[cfg(feature = "server")]
-// See https://dioxuslabs.com/learn/0.6/guides/use axum::routing::get;
 use axum;
+
 use dioxus::prelude::*;
 
 #[cfg(feature = "server")]
-// See https://dioxuslabs.com/learn/0.6/guides/
 use dioxus_cli_config;
 
 #[cfg(feature = "server")]
 use sqlx::Row;
 
 #[cfg(feature = "server")]
-// See https://dioxuslabs.com/learn/0.6/guides/fullstack/managing_dependencies/
 use tokio;
 
 #[cfg(feature = "server")]
 use sqlx::{postgres::PgPoolOptions, PgPool};
 
 const CSS: Asset = asset!("/assets/main.css");
+const FAVICON: Asset = asset!("/assets/favicon.ico");
 
 // Create a new wrapper type
 #[derive(Clone)]
@@ -44,17 +43,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 /////////////////////////////////////////
 // Server elements (functions & logic) //
-////////////////////////////////////////
+/////////////////////////////////////////
 
 #[cfg(feature = "server")]
 pub static DB_POOL: std::sync::LazyLock<PgPool> =
     std::sync::LazyLock::new(|| init_dbpool().unwrap());
-
-// #[cfg(feature = "server")]
-// thread_local! {
-// #[allow(non_upper_case_globals)]
-// pub static dbp: PgPool;
-// }
 
 #[cfg(feature = "server")]
 async fn launch_server() {
@@ -77,6 +70,7 @@ async fn launch_server() {
     axum::serve(listener, router).await.unwrap();
 }
 
+/// TODO: Logging settings don't work in this setup.
 #[cfg(feature = "server")]
 fn init_logging() {
     use log::LevelFilter::{Info, Warn};
@@ -133,6 +127,11 @@ async fn save_dog(image: String) -> Result<(), ServerFnError> {
     // And then write a newline to it with the image url
     _ = file.write_fmt(format_args!("{image}\n"));
 
+    // Then close the file
+    file.flush().unwrap_or_else(|err| {
+        log::error!("Failed to flush the 'dogs.txt' file. Reason: '{}'.", err);
+    });
+
     log::info!("URL '{image}' was saved to 'dogs.txt' file.");
 
     Ok(())
@@ -143,13 +142,21 @@ async fn save_dog_to_db(_image_url: String) -> Result<(), ServerFnError> {
     // For now, just testing the db interaction.
     let mut conn = DB_POOL.acquire().await.unwrap();
     log::info!("Number of active db connections: {}.", DB_POOL.size());
-    let row = sqlx::query("SELECT to_char(current_timestamp, 'YYYY-MM-DD HH24:MI:SS') now")
+    match sqlx::query("SELECT to_char(current_timestamp, 'YYYY-MM-DD HH24:MI:SS') now")
         .fetch_one(conn.as_mut())
         .await
-        .unwrap();
-    log::info!("Database time: '{}'.", row.get::<&str, &str>("now"));
-
-    Ok(())
+    {
+        Ok(row) => {
+            log::info!("Got database time: '{}'.", row.get::<&str, &str>("now"));
+            Ok(())
+        }
+        Err(err) => {
+            log::error!("Failed to query the database. Reason: '{}'.", err);
+            Err(ServerFnError::ServerError(
+                "Failed to query the database".into(),
+            ))
+        }
+    }
 }
 
 ////////////////
@@ -158,10 +165,16 @@ async fn save_dog_to_db(_image_url: String) -> Result<(), ServerFnError> {
 
 #[component]
 fn App() -> Element {
-    // Provide that type as a Context
+    // Provide that type as a Context. Used later in the `Title` (child) component.
     use_context_provider(|| TitleState("HotDog! 🌭".to_string()));
+
     rsx! {
         document::Stylesheet { href: CSS }
+        document::Meta {
+            name: "description",
+            content: "HotDog! 🌭 A Dioxus 0.6 fullstack sample",
+        }
+        document::Link { rel: "icon shortcut", r#type: "image/x-icon", href: FAVICON }
         div { class: "flex flex-col min-h-screen bg-gray-300 justify-center items-center",
             Title {}
             DogView {}
@@ -171,8 +184,9 @@ fn App() -> Element {
 
 #[component]
 fn Title() -> Element {
-    // Consume that type as a Context.
+    // Consume that (previously provided) type as a Context.
     let title = use_context::<TitleState>();
+
     rsx! {
         div { id: "title", class: "pb-12",
             p { class: "text-3xl text-gray-500 font-bold", "{title.0}" }
@@ -200,7 +214,7 @@ fn DogView() -> Element {
     rsx! {
         div { id: "dogview", class: "flex justify-center mb-4 space-x-4",
             button {
-                class: "bg-gray-300 hover:bg-gray-600 hover:text-white rounded-md px-2",
+                class: "bg-gray-300 hover:bg-gray-500 hover:text-white rounded-md px-2",
                 onclick: move |_| async move {
                     let current = img_src.cloned().unwrap();
                     img_src.restart();
@@ -211,7 +225,7 @@ fn DogView() -> Element {
                 "Save"
             }
             button {
-                class: "bg-gray-300 hover:bg-gray-600 hover:text-white rounded-md px-3",
+                class: "bg-gray-300 hover:bg-gray-500 hover:text-white rounded-md px-3",
                 onclick: move |_| img_src.restart(),
                 "id": "refresh",
                 "Refresh"
