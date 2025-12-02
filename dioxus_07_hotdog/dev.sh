@@ -1,3 +1,4 @@
 #!/bin/sh
 
-dx serve --hotpatch
+dx serve --hotpatch --web
+

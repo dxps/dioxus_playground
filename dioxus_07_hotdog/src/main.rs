@@ -10,7 +10,19 @@ struct DogApi {
 }
 
 fn main() {
+    #[cfg(not(feature = "server"))]
     dioxus::launch(App);
+
+    #[cfg(feature = "server")]
+    dioxus::serve(|| async move {
+        // Create a new axum router for our Dioxus app
+        let router = dioxus::server::router(App);
+
+        // .. customize it however you want ..
+
+        // And then return it
+        Ok(router)
+    })
 }
 
 #[component]
@@ -58,10 +70,32 @@ fn DogView() -> Element {
             }
             button {
                 id: "save",
-                onclick: move |_| img_src.restart(),
+                onclick: move |_| async move {
+                    let current = img_src.cloned().unwrap();
+                    img_src.restart();
+                    _ = api_save_dog(current).await;
+                },
                 class: "cursor-pointer",
                 "save!"
             }
         }
     }
+}
+
+#[post("/api/save_dog")]
+async fn api_save_dog(image: String) -> Result<()> {
+    use std::io::Write;
+
+    // Open the `dogs.txt` file in append-only mode, creating it if it doesn't exist.
+    let mut file = std::fs::OpenOptions::new()
+        .write(true)
+        .append(true)
+        .create(true)
+        .open("dogs.txt")
+        .unwrap();
+
+    // And then write a newline to it with the image url.
+    file.write_fmt(format_args!("{image}\n"));
+
+    Ok(())
 }

@@ -4,15 +4,15 @@ version = "0.1.0"
 authors = ["dxps <marius.ileana@gmail.com>"]
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-dioxus = { version = "0.7.1", features = [] }
-reqwest = { version = "0.12.24", features = ["json"] }
-serde = { version = "1.0.228", features = ["derive"] }
+dioxus = { version = "0.7.1", features = [ "fullstack" ] }
+reqwest = { version = "0.12.24", features = [ "json" ] }
+serde = { version = "1.0.228", features = [ "derive" ] }
+# tokio-tungstenite = "0.28.0"
 
 [features]
-default = ["web"]
-web = ["dioxus/web"]
-desktop = ["dioxus/desktop"]
-mobile = ["dioxus/mobile"]
+default = [ "web" ]
+web = [ "dioxus/web" ]
+desktop = [ "dioxus/desktop" ]
+mobile = [ "dioxus/mobile" ]
+server = [ "dioxus/server" ]
