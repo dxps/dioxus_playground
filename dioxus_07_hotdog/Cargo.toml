@@ -8,11 +8,12 @@ edition = "2021"
 dioxus = { version = "0.7.1", features = [ "fullstack" ] }
 reqwest = { version = "0.12.24", features = [ "json" ] }
 serde = { version = "1.0.228", features = [ "derive" ] }
-# tokio-tungstenite = "0.28.0"
+
+rusqlite = { version = "0.37.0", optional = true }
 
 [features]
 default = [ "web" ]
 web = [ "dioxus/web" ]
 desktop = [ "dioxus/desktop" ]
 mobile = [ "dioxus/mobile" ]
-server = [ "dioxus/server" ]
+server = [ "dioxus/server", "dep:rusqlite" ]
