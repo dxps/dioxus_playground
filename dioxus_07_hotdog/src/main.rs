@@ -82,9 +82,9 @@ fn DogView() -> Element {
     }
 }
 
-///////////////////////
-/// the server side ///
-///////////////////////
+/////////////////////
+// the server side //
+/////////////////////
 
 #[cfg(feature = "server")]
 thread_local! {
