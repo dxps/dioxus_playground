@@ -7,10 +7,10 @@ use dioxus::prelude::*;
 #[cfg(feature = "server")]
 thread_local! {
     pub static DB: rusqlite::Connection = {
-        // Open the database from the persisted "hotdog.db" file
+        // Open the database from the persisted "hotdog.db" file.
         let conn = rusqlite::Connection::open("hotdog.db").expect("Failed to open database");
 
-        // Create the "dogs" table if it doesn't already exist
+        // Create the "dogs" table if it doesn't already exist.
         conn.execute_batch(
             "CREATE TABLE IF NOT EXISTS dogs (
                 id INTEGER PRIMARY KEY,
@@ -18,7 +18,6 @@ thread_local! {
             );",
         ).unwrap();
 
-        // Return the connection
         conn
     };
 }
@@ -31,7 +30,7 @@ pub async fn api_save_dog(image: String) -> Result<()> {
     Ok(())
 }
 
-// Query the database and return the last 10 dogs and their url
+// Query the database and return the last 10 dogs and their url.
 #[server]
 #[get("/api/list_dogs")]
 pub async fn list_dogs() -> Result<Vec<(usize, String)>, ServerFnError> {
@@ -45,4 +44,12 @@ pub async fn list_dogs() -> Result<Vec<(usize, String)>, ServerFnError> {
     });
 
     Ok(dogs)
+}
+
+#[server]
+#[post("/api/unsave_dog")]
+pub async fn api_unsave_dog(id: usize) -> Result<()> {
+    DB.with(|f| f.execute("DELETE FROM dogs WHERE id=?", &[&id]))?;
+    info!("Unsaved favorite dog w/ id {}", id);
+    Ok(())
 }
