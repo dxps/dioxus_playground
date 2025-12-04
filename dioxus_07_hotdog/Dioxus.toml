@@ -3,7 +3,7 @@
 [web.app]
 
 # HTML title tag content
-title = "dioxus_07_hotdog"
+title = "Dioxus 0.7 HotDog"
 
 # include `assets` in web platform
 [web.resource]
