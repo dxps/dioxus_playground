@@ -16,7 +16,7 @@ pub fn DogView() -> Element {
 
     rsx! {
         div { id: "dogview",
-            img { src: img_src, max_height: "300px" }
+            img { src: img_src }
         }
         div { id: "buttons", class: "flex flex-row gap-2",
             button {
