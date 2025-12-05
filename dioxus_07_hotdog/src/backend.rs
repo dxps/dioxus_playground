@@ -23,8 +23,8 @@ thread_local! {
 }
 
 #[server]
-#[post("/api/save_dog")]
-pub async fn api_save_dog(image: String) -> Result<()> {
+#[post("/api/fav_dog")]
+pub async fn api_fav_dog(image: String) -> Result<()> {
     DB.with(|f| f.execute("INSERT INTO dogs (url) VALUES (?)", &[&image]))?;
 
     Ok(())
@@ -47,8 +47,8 @@ pub async fn list_dogs() -> Result<Vec<(usize, String)>, ServerFnError> {
 }
 
 #[server]
-#[post("/api/unsave_dog")]
-pub async fn api_unsave_dog(id: usize) -> Result<()> {
+#[post("/api/unfav_dog")]
+pub async fn api_unfav_dog(id: usize) -> Result<()> {
     DB.with(|f| f.execute("DELETE FROM dogs WHERE id=?", &[&id]))?;
     info!("Unsaved favorite dog w/ id {}", id);
     Ok(())

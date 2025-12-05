@@ -1,61 +1,43 @@
+use crate::backend::{api_unfav_dog, list_dogs};
 use dioxus::prelude::*;
-
-use crate::backend::{api_unsave_dog, list_dogs};
+use std::vec;
 
 #[component]
 pub fn Favorites() -> Element {
     //
     let mut favs = use_signal::<Vec<(usize, String)>>(|| Vec::default());
-    let mut fetch = use_signal(|| false);
+    let mut initial = use_signal(|| true);
 
-    // Initial fetch.
-    // Create a pending resource that resolves to the list of dogs from the backend
-    // `use_server_future` is very similar to `use_resource`, but it waits
-    // for the future to finish before continuing rendering and integrates
-    // with dioxus fullstack to serialize that data from the server to the client.
-    let favorites = use_server_future(list_dogs)?;
-    favs.set(favorites.unwrap().unwrap());
-
-    // let mut refetch_action = use_action(move || async move {
-    // info!("Refetching favorites ...");
-    // match list_dogs().await {
-    // Ok(entries) => {
-    // info!("Refetched {} favorites.", entries.len());
-    // favs.set(entries);
-    // Ok(())
-    // }
-    // Err(e) => {
-    // error!("Error refetching favorites: {e}");
-    // Err(e)
-    // }
-    // }
-    // });
-
-    use_effect(move || {
-        if fetch() {
-            spawn(async move {
-                info!("Refetching favorites ...");
-                match list_dogs().await {
-                    Ok(entries) => {
-                        info!("Refetched {} favorites.", entries.len());
-                        favs.set(entries);
-                    }
-                    Err(e) => {
-                        error!("Error refetching favorites: {e}");
-                    }
-                }
-            });
-            fetch.set(false);
+    // The initial fetch.
+    use_resource(move || async move {
+        if initial() {
+            let entries = list_dogs().await;
+            favs.set(entries.unwrap());
+            initial.set(false);
+            info!("Initial fetch of {} favorites.", favs().len());
         }
     });
 
-    info!("Rendering {} favorites ...", favs().len());
+    let mut refetch_action = use_action(move || async move {
+        info!("Refetching favorites ...");
+        match list_dogs().await {
+            Result::Ok(entries) => {
+                info!("Refetched {} favorites.", entries.len());
+                favs.set(entries);
+            }
+            Err(e) => {
+                error!("Error refetching favorites: {e}");
+            }
+        }
+        dioxus::Ok(())
+    });
 
     rsx! {
+        p { "{favs().len()} Favorites" }
         div { id: "favorites",
             div { id: "favorites-container",
                 for (id , url) in favs() {
-                    // Render a div for each photo using the dog's ID as the list key
+                    // Render a div for each photo using the dog's ID as the list key.
                     div { key: "{id}", class: "favorite-dog",
                         div { class: "relative",
                             img { class: "block w-full", src: "{url}" }
@@ -63,8 +45,14 @@ pub fn Favorites() -> Element {
                                 class: "absolute m-auto rounded-full bg-red-700 text-white px-2 cursor-pointer",
                                 onclick: move |_| {
                                     async move {
-                                        let _ = api_unsave_dog(id).await;
-                                        fetch.set(true);
+                                        match api_unfav_dog(id).await {
+                                            Ok(()) => {
+                                                info!("Unfaved dog {id}");
+                                                refetch_action.call();
+                                            }
+                                            Err(e) => error!("Error unsaving dog {id}: {e}"),
+                                        }
+                                        refetch_action.call();
                                     }
                                 },
                                 "x"

@@ -32,12 +32,12 @@ fn main() {
 
     #[cfg(feature = "server")]
     dioxus::serve(|| async move {
-        // Create a new axum router for our Dioxus app
+        // Create a new axum router for our Dioxus app.
         let router = dioxus::server::router(App);
 
-        // .. customize it however you want ..
+        // Customize it however you want.
 
-        // And then return it
+        // And then return it.
         Ok(router)
     })
 }

@@ -5,7 +5,7 @@ authors = ["dxps <marius.ileana@gmail.com>"]
 edition = "2021"
 
 [dependencies]
-dioxus = { version = "0.7.1", features = [ "fullstack", "router" ] }
+dioxus = { version = "0.7.2", features = [ "fullstack", "router" ] }
 reqwest = { version = "0.12.24", features = [ "json" ] }
 serde = { version = "1.0.228", features = [ "derive" ] }
 
