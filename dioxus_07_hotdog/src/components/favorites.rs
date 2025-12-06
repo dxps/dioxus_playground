@@ -16,15 +16,13 @@ async fn fetch_favs(mut favs: Signal<Vec<(usize, String)>>) {
 pub fn Favorites() -> Element {
     //
     let favs = use_signal::<Vec<(usize, String)>>(|| Vec::default());
-    let mut initial = use_signal(|| true);
 
     // The initial fetch.
-    use_resource(move || async move {
-        if initial() {
+    use_hook(|| {
+        spawn(async move {
             fetch_favs(favs).await;
-            initial.set(false);
             debug!("Initially fetched {} favorites.", favs().len());
-        }
+        })
     });
 
     let mut refetch_action = use_action(move || async move {
