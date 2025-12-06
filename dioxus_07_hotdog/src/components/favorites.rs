@@ -2,42 +2,42 @@ use crate::backend::{api_unfav_dog, list_dogs};
 use dioxus::prelude::*;
 use std::vec;
 
+async fn fetch_favs(mut favs: Signal<Vec<(usize, String)>>) {
+    match list_dogs().await {
+        Result::Ok(entries) => {
+            favs.set(entries);
+        }
+        Err(e) => {
+            error!("Error fetching favorites: {e}");
+        }
+    }
+}
+
 #[component]
 pub fn Favorites() -> Element {
     //
-    let mut favs = use_signal::<Vec<(usize, String)>>(|| Vec::default());
+    let favs = use_signal::<Vec<(usize, String)>>(|| Vec::default());
     let mut initial = use_signal(|| true);
 
     // The initial fetch.
     use_resource(move || async move {
         if initial() {
-            let entries = list_dogs().await;
-            favs.set(entries.unwrap());
+            fetch_favs(favs).await;
             initial.set(false);
-            info!("Initial fetch of {} favorites.", favs().len());
+            debug!("Initially fetched {} favorites.", favs().len());
         }
     });
 
     let mut refetch_action = use_action(move || async move {
-        info!("Refetching favorites ...");
-        match list_dogs().await {
-            Result::Ok(entries) => {
-                info!("Refetched {} favorites.", entries.len());
-                favs.set(entries);
-            }
-            Err(e) => {
-                error!("Error refetching favorites: {e}");
-            }
-        }
+        fetch_favs(favs).await;
+        debug!("Refetched {} favorites ...", favs().len());
         dioxus::Ok(())
     });
 
     rsx! {
-        p { "{favs().len()} Favorites" }
         div { id: "favorites",
             div { id: "favorites-container",
                 for (id , url) in favs() {
-                    // Render a div for each photo using the dog's ID as the list key.
                     div { key: "{id}", class: "favorite-dog",
                         div { class: "relative",
                             img { class: "block w-full", src: "{url}" }
@@ -47,12 +47,10 @@ pub fn Favorites() -> Element {
                                     async move {
                                         match api_unfav_dog(id).await {
                                             Ok(()) => {
-                                                info!("Unfaved dog {id}");
                                                 refetch_action.call();
                                             }
                                             Err(e) => error!("Error unsaving dog {id}: {e}"),
                                         }
-                                        refetch_action.call();
                                     }
                                 },
                                 "x"

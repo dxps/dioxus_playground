@@ -2,7 +2,7 @@
 name = "dioxus_07_hotdog"
 version = "0.1.0"
 authors = ["dxps <marius.ileana@gmail.com>"]
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 dioxus = { version = "0.7.2", features = [ "fullstack", "router" ] }

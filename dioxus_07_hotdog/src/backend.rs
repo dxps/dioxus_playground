@@ -50,6 +50,5 @@ pub async fn list_dogs() -> Result<Vec<(usize, String)>, ServerFnError> {
 #[post("/api/unfav_dog")]
 pub async fn api_unfav_dog(id: usize) -> Result<()> {
     DB.with(|f| f.execute("DELETE FROM dogs WHERE id=?", &[&id]))?;
-    info!("Unsaved favorite dog w/ id {}", id);
     Ok(())
 }
