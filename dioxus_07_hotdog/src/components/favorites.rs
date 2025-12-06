@@ -1,9 +1,8 @@
-use crate::backend::{api_unfav_dog, list_dogs};
+use crate::backend::{sf_list_dogs, sf_unfav_dog};
 use dioxus::prelude::*;
-use std::vec;
 
 async fn fetch_favs(mut favs: Signal<Vec<(usize, String)>>) {
-    match list_dogs().await {
+    match sf_list_dogs().await {
         Result::Ok(entries) => {
             favs.set(entries);
         }
@@ -45,7 +44,7 @@ pub fn Favorites() -> Element {
                                 class: "absolute m-auto rounded-full bg-red-700 text-white px-2 cursor-pointer",
                                 onclick: move |_| {
                                     async move {
-                                        match api_unfav_dog(id).await {
+                                        match sf_unfav_dog(id).await {
                                             Ok(()) => {
                                                 refetch_action.call();
                                             }

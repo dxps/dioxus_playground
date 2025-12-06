@@ -22,18 +22,10 @@ thread_local! {
     };
 }
 
-#[server]
-#[post("/api/fav_dog")]
-pub async fn api_fav_dog(image: String) -> Result<()> {
-    DB.with(|f| f.execute("INSERT INTO dogs (url) VALUES (?)", &[&image]))?;
-
-    Ok(())
-}
-
 // Query the database and return the last 10 dogs and their url.
-#[server]
+#[server(endpoint = "list_dogs")]
 #[get("/api/list_dogs")]
-pub async fn list_dogs() -> Result<Vec<(usize, String)>, ServerFnError> {
+pub async fn sf_list_dogs() -> Result<Vec<(usize, String)>, ServerFnError> {
     let dogs = DB.with(|f| {
         f.prepare("SELECT id, url FROM dogs ORDER BY id DESC LIMIT 10")
             .unwrap()
@@ -46,9 +38,17 @@ pub async fn list_dogs() -> Result<Vec<(usize, String)>, ServerFnError> {
     Ok(dogs)
 }
 
-#[server]
+#[server(endpoint = "fav_dog")]
+#[post("/api/fav_dog")]
+pub async fn sf_fav_dog(image: String) -> Result<()> {
+    DB.with(|f| f.execute("INSERT INTO dogs (url) VALUES (?)", &[&image]))?;
+
+    Ok(())
+}
+
+#[server(endpoint = "unfav_dog")]
 #[post("/api/unfav_dog")]
-pub async fn api_unfav_dog(id: usize) -> Result<()> {
+pub async fn sf_unfav_dog(id: usize) -> Result<()> {
     DB.with(|f| f.execute("DELETE FROM dogs WHERE id=?", &[&id]))?;
     Ok(())
 }

@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::{backend::api_fav_dog, DogApi};
+use crate::{DogApi, backend::sf_fav_dog};
 
 #[component]
 pub fn DogView() -> Element {
@@ -30,7 +30,7 @@ pub fn DogView() -> Element {
                 onclick: move |_| async move {
                     let current = img_src.cloned().unwrap();
                     img_src.restart();
-                    _ = api_fav_dog(current).await;
+                    _ = sf_fav_dog(current).await;
                 },
                 class: "cursor-pointer",
                 "save!"
