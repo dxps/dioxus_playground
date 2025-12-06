@@ -14,27 +14,21 @@ pub fn DogView() -> Element {
             .message
     });
 
+    let skip_dog = move |_| img_src.restart();
+
+    let fav_dog = move |_| async move {
+        let current = img_src.cloned().unwrap();
+        img_src.restart();
+        _ = sf_fav_dog(current).await;
+    };
+
     rsx! {
         div { id: "dogview",
             img { src: img_src }
         }
         div { id: "buttons", class: "flex flex-row gap-2",
-            button {
-                id: "skip",
-                onclick: move |_| img_src.restart(),
-                class: "cursor-pointer",
-                "skip"
-            }
-            button {
-                id: "save",
-                onclick: move |_| async move {
-                    let current = img_src.cloned().unwrap();
-                    img_src.restart();
-                    _ = sf_fav_dog(current).await;
-                },
-                class: "cursor-pointer",
-                "save!"
-            }
+            button { id: "skip", onclick: skip_dog, class: "cursor-pointer", "skip" }
+            button { id: "save", onclick: fav_dog, class: "cursor-pointer", "save!" }
         }
     }
 }

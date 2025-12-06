@@ -14,8 +14,17 @@ async fn fetch_favs(mut favs: Signal<Vec<(usize, String)>>) {
 
 #[component]
 pub fn Favorites() -> Element {
-    //
     let favs = use_signal::<Vec<(usize, String)>>(|| Vec::default());
+
+    let unfav_dog = move |id| async move {
+        match sf_unfav_dog(id).await {
+            Ok(()) => {
+                fetch_favs(favs).await;
+                debug!("Refetched {} favorites ...", favs().len());
+            }
+            Err(e) => error!("Error unsaving dog {id}: {e}"),
+        }
+    };
 
     // The initial fetch.
     use_hook(|| {
@@ -23,12 +32,6 @@ pub fn Favorites() -> Element {
             fetch_favs(favs).await;
             debug!("Initially fetched {} favorites.", favs().len());
         })
-    });
-
-    let mut refetch_action = use_action(move || async move {
-        fetch_favs(favs).await;
-        debug!("Refetched {} favorites ...", favs().len());
-        dioxus::Ok(())
     });
 
     rsx! {
@@ -40,16 +43,7 @@ pub fn Favorites() -> Element {
                             img { class: "block w-full", src: "{url}" }
                             button {
                                 class: "absolute m-auto rounded-full bg-red-700 text-white px-2 cursor-pointer",
-                                onclick: move |_| {
-                                    async move {
-                                        match sf_unfav_dog(id).await {
-                                            Ok(()) => {
-                                                refetch_action.call();
-                                            }
-                                            Err(e) => error!("Error unsaving dog {id}: {e}"),
-                                        }
-                                    }
-                                },
+                                onclick: move |_| unfav_dog(id),
                                 "x"
                             }
                         }

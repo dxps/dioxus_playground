@@ -1,4 +1,5 @@
 [application]
+name = "Dioxus 0.7 HotDog"
 
 [web.app]
 
