@@ -17,3 +17,8 @@ web = [ "dioxus/web" ]
 desktop = [ "dioxus/desktop" ]
 mobile = [ "dioxus/mobile" ]
 server = [ "dioxus/server", "dep:rusqlite" ]
+
+[profile.release]
+lto = true
+opt-level = 3
+strip = true
