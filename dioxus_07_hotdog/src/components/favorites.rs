@@ -27,11 +27,11 @@ pub fn Favorites() -> Element {
     };
 
     // The initial fetch.
-    use_hook(|| {
+    use_effect(move || {
         spawn(async move {
             fetch_favs(favs).await;
             debug!("Initially fetched {} favorites.", favs().len());
-        })
+        });
     });
 
     rsx! {
