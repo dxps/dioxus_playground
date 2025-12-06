@@ -23,7 +23,7 @@ thread_local! {
 }
 
 // Query the database and return the last 10 dogs and their url.
-#[server(endpoint = "list_dogs")]
+#[server(endpoint = "list_dogs", input = GetUrl)]
 #[get("/api/list_dogs")]
 pub async fn sf_list_dogs() -> Result<Vec<(usize, String)>, ServerFnError> {
     let dogs = DB.with(|f| {
