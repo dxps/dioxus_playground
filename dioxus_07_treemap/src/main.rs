@@ -79,6 +79,7 @@ fn Rectangle(props: RectangleProps) -> Element {
                 style: "cursor:pointer; pointer-events:auto;",
 
                 onclick: move |_| {
+                    debug!("Rectangle {} clicked.", item.node.name);
                     on_click.call(item.node.name.to_string());
                 },
             }
