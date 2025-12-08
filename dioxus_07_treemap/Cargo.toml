@@ -1,0 +1,14 @@
+[package]
+name = "dx_treemap"
+version = "0.1.0"
+authors = ["dxps <marius.ileana@gmail.com>"]
+edition = "2024"
+
+[dependencies]
+dioxus = { version = "0.7.2", features = [] }
+
+[features]
+default = ["web"]
+web = ["dioxus/web"]
+desktop = ["dioxus/desktop"]
+mobile = ["dioxus/mobile"]
