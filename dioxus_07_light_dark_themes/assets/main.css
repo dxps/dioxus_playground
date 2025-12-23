@@ -1,0 +1,120 @@
+/* 
+-------------------------
+  LIGHT THEME (default)  
+-------------------------
+*/
+body {
+	background-color: #f1f1f3;
+	color: #111111;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	margin: 20px;
+}
+
+#hero {
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+#links {
+	width: 400px;
+	text-align: left;
+	font-size: x-large;
+	color: #111111;
+	display: flex;
+	flex-direction: column;
+}
+
+#links a {
+	color: #111111;
+	text-decoration: none;
+	margin: 10px 0;
+	border: #111111 1px solid;
+	border-radius: 5px;
+	padding: 10px;
+}
+
+#links a:hover {
+	background-color: #e2e2e7;
+	cursor: pointer;
+}
+
+#header {
+	max-width: 1200px;
+}
+
+/* Echo */
+#echo {
+	width: 400px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 50px;
+	background-color: #ffffff;
+	padding: 20px;
+	border-radius: 10px;
+}
+
+#echo > h4 {
+	margin: 0 0 15px 0;
+}
+
+#echo > input {
+	border: none;
+	border-bottom: 1px #111111 solid;
+	background-color: transparent;
+	color: #111111;
+	transition: border-bottom-color 0.2s ease;
+	outline: none;
+	display: block;
+	padding: 0 0 5px 0;
+	width: 100%;
+}
+
+#echo > input:focus {
+	border-bottom-color: #3b5caa;
+}
+
+#echo > p {
+	margin: 20px 0 0 auto;
+}
+
+/* 
+---------------------------------------------------
+  DARK THEME (when .dark is present on html/body)  
+---------------------------------------------------
+*/
+.dark body {
+	background-color: #0f1116;
+	color: #dddddd;
+}
+
+/* Override text/link colors */
+.dark #links {
+	color: #eeeeee;
+}
+
+.dark #links a {
+	color: #eeeeee;
+	border-color: #eeeeee;
+}
+
+.dark #links a:hover {
+	background-color: #1f1f1f;
+}
+
+/* Echo dark card */
+.dark #echo {
+	background-color: #1e222d;
+}
+
+/* Echo input dark styles */
+.dark #echo > input {
+	border-bottom-color: #ffffff;
+	color: #ffffff;
+}
+
+.dark #echo > input:focus {
+	border-bottom-color: #6d85c6;
+}

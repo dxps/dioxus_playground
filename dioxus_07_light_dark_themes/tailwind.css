@@ -1,0 +1,15 @@
+@import 'tailwindcss';
+
+/* Tell Tailwind where to look for classes (Rust + HTML + CSS). */
+@source "./src/**/*.{rs,html,css}";
+@source "./index.html";
+
+/* Make `dark:` use a `.dark` class instead of prefers-color-scheme. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+	/* Make all buttons use Tailwind's cursor-pointer utility. */
+	button {
+		@apply cursor-pointer;
+	}
+}
